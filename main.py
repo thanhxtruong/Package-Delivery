@@ -14,7 +14,7 @@ def load_pkg_data(filename):
         # Skip the header
         next(readCSV)
         for row in readCSV:
-            # print(row)
+            print(row)
             # Create an address obj
             address = Address(row[1], row[2], row[3], row[4])
             package = Package(row[0], address, row[5])
@@ -39,6 +39,14 @@ def load_pkg_data(filename):
             # Set specific truck requirement
             if not (row[8] == ''):
                 package.set_truck(row[8])
+
+            # Set combined packages requirement
+            combined_pkg_list = []
+            if not (row[9] == ''):
+                split_list = row[9].split(',')
+                for item in split_list:
+                    combined_pkg_list.append(item)
+                package.set_combined_pkg(combined_pkg_list)
 
 
 def load_graph(filename):
