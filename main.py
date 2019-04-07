@@ -6,10 +6,13 @@ from package import Package
 from address import Address
 from graph import Vertex, Graph
 from truck import Truck
+from data_structure import Set
 
 
 def load_pkg_data(filename):
-    pkg_list = []
+    # pkg_list = []
+    pkg_dict = {}
+    address_keys = Set()
     # Open file, read package data one line at a time skipping the first row (header).
     with open(filename) as csvfile:
         readCSV = csv.reader(csvfile)
@@ -23,7 +26,7 @@ def load_pkg_data(filename):
             # Set delivery deadline
             # Deadline is hardcoded to 23:00:00 if set to 'EOD'
             if row[6] == 'EOD':
-                package.add_delivery_deadline(time(23,0,0))
+                package.add_delivery_deadline(time(23, 0, 0))
             else:
                 split_time = row[6].split(':')
                 hour = int(split_time[0])
@@ -55,14 +58,27 @@ def load_pkg_data(filename):
                     combined_pkg_list.append(item)
                 package.set_combined_pkg(combined_pkg_list)
 
-            # Add package to pkg_list
-            pkg_list.append(package)
+            # Add package to dictionary
+            if package.address not in pkg_dict.keys():
+                pkg_dict[package.address] = [package]
+            else:
+                pkg_list = pkg_dict.get(package.address)
+                pkg_list.append(package)
+
+    for key in pkg_dict.keys():
+        print(key)
+        for package in pkg_dict.get(key):
+            print(package)
+        print("==============================")
+
+    # Add package to pkg_list
+    # pkg_list.append(package)
     # print("UNSORTED")
     # for package in pkg_list:
     #     print(package)
     # print("==============================================================")
     # Sort list of packages by deadline
-    merge_sort(pkg_list, 0, len(pkg_list) - 1)
+    # merge_sort(pkg_list, 0, len(pkg_list) - 1)
     # print("SORTED")
     # for package in pkg_list:
     #     print(package)
@@ -71,16 +87,16 @@ def load_pkg_data(filename):
     #  Add each package to a list.
     #  Iterate through the list and set truck requirement using combined_pkg_set.
     #  Return the pkg_list.
-    return pkg_list
+    return pkg_dict
+
 
 def create_dest_priority(pkg_list):
-
     # TODO: Dump data for packages into a LinkedList with each Node holding an address and data including a list of all packages that need to deliver to that address
     # TODO:
     #  Sort data into a priority queue using MinHeap.
     #  Packages with combined_pkg set to True will have the same Priority#
 
-    return[]
+    return []
 
 
 def load_graph(filename):
@@ -128,7 +144,7 @@ def load_graph(filename):
 
 
 # TODO: Implement pseudocode
-def assign_truck (destination):
+def assign_truck(destination):
     # for package in destination -> pkg_list
     # if (package -> truck is not None)
     #     for truck in trucks
@@ -137,7 +153,7 @@ def assign_truck (destination):
     # else
     #     for truck in trucks
     #         if (MAX_PKG - len(truck -> route)) >= len(temp_list)
-            return None
+    return None
 
 
 # Merge sort algorithm
@@ -196,7 +212,7 @@ def merge_sort(numbers, i, k):
 
 if __name__ == "__main__":
     trucks = []
-    #TODO: create a Truck class that includes name, current_location, and route[] for each truck
+    # TODO: create a Truck class that includes name, current_location, and route[] for each truck
 
     # Load data for packages and save them into a priority queue.
     # Priority is assigned based on deadline.
@@ -226,9 +242,3 @@ if __name__ == "__main__":
     #
     #     route = graph.get_shortest_path(truck -> current_location, destination)
     #     Add route to truck -> route
-
-
-
-
-
-
