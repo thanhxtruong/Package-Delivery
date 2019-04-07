@@ -15,6 +15,38 @@ class Package:
         self.truck = None
         self.combined_pkg = []
 
+    # Override method to print package by ID and deadline
+    def __str__(self):
+        return self.pkg_id + " " + str(self.deadline)
+
+    # Override equality comparison to compare based on delivery deadline
+    def __eq__(self, other):
+        if isinstance(other, Package):
+            return self.deadline == other.deadline
+        else:
+            return NotImplemented
+
+    # Override inequality comparison to compare based on delivery deadline
+    def __ne__(self, other):
+        result = self.__eq__(other)
+        if result is NotImplemented:
+            return result
+        return not result
+
+    # Override less than comparison to compare based on delivery deadline
+    def __lt__(self, other):
+        if isinstance(other, Package):
+            return self.deadline < other.deadline
+        else:
+            return NotImplemented
+
+    # Override greater than comparison to compare based on delivery deadline
+    def __gt__(self, other):
+        if isinstance(other, Package):
+            return self.deadline > other.deadline
+        else:
+            return NotImplemented
+
     # Set delivery deadline
     def add_delivery_deadline(self, deadline):
         self.deadline = deadline

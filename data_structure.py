@@ -68,3 +68,4 @@ class Queue:
         self.list.remove_after(None)
         # Return popped item
         return popped_item
+

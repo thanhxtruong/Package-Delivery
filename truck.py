@@ -7,5 +7,3 @@ class Truck:
     def __str__(self):
         return self.name
 
-    def set_start_location(self, vertex):
-        self.current_location = vertex

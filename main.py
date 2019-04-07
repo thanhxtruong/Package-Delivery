@@ -9,6 +9,7 @@ from truck import Truck
 
 
 def load_pkg_data(filename):
+    pkg_list = []
     # Open file, read package data one line at a time skipping the first row (header).
     with open(filename) as csvfile:
         readCSV = csv.reader(csvfile)
@@ -20,7 +21,10 @@ def load_pkg_data(filename):
             address = Address(row[1], row[2], row[3], row[4])
             package = Package(row[0], address, row[5])
             # Set delivery deadline
-            if not (row[6] == 'EOD'):
+            # Deadline is hardcoded to 23:00:00 if set to 'EOD'
+            if row[6] == 'EOD':
+                package.add_delivery_deadline(time(23,0,0))
+            else:
                 split_time = row[6].split(':')
                 hour = int(split_time[0])
                 # Split string again to remove 'AM'/'PM'
@@ -51,11 +55,23 @@ def load_pkg_data(filename):
                     combined_pkg_list.append(item)
                 package.set_combined_pkg(combined_pkg_list)
 
+            # Add package to pkg_list
+            pkg_list.append(package)
+    # print("UNSORTED")
+    # for package in pkg_list:
+    #     print(package)
+    # print("==============================================================")
+    # Sort list of packages by deadline
+    merge_sort(pkg_list, 0, len(pkg_list) - 1)
+    # print("SORTED")
+    # for package in pkg_list:
+    #     print(package)
+
     # TODO:
     #  Add each package to a list.
     #  Iterate through the list and set truck requirement using combined_pkg_set.
     #  Return the pkg_list.
-    return []
+    return pkg_list
 
 def create_dest_priority(pkg_list):
 
@@ -122,6 +138,60 @@ def assign_truck (destination):
     #     for truck in trucks
     #         if (MAX_PKG - len(truck -> route)) >= len(temp_list)
             return None
+
+
+# Merge sort algorithm
+def merge(numbers, i, j, k):
+    merged_size = k - i + 1  # Size of merged partition
+    merged_numbers = [0] * merged_size  # Dynamically allocates temporary array
+    # for merged numbers
+    merge_pos = 0  # Position to insert merged number
+    left_pos = i  # Initialize left partition position
+    right_pos = j + 1  # Initialize right partition position
+
+    # Add smallest element from left or right partition to merged numbers
+    while left_pos <= j and right_pos <= k:
+        if numbers[left_pos] < numbers[right_pos] or numbers[left_pos] == numbers[right_pos]:
+            merged_numbers[merge_pos] = numbers[left_pos]
+            left_pos += 1
+        else:
+            merged_numbers[merge_pos] = numbers[right_pos]
+            right_pos += 1
+        merge_pos = merge_pos + 1
+
+    # If left partition is not empty, add remaining elements to merged numbers
+    while left_pos <= j:
+        merged_numbers[merge_pos] = numbers[left_pos]
+        left_pos += 1
+        merge_pos += 1
+
+    # If right partition is not empty, add remaining elements to merged numbers
+    while right_pos <= k:
+        merged_numbers[merge_pos] = numbers[right_pos]
+        right_pos = right_pos + 1
+        merge_pos = merge_pos + 1
+
+    # Copy merge number back to numbers
+    for merge_pos in range(merged_size):
+        numbers[i + merge_pos] = merged_numbers[merge_pos]
+
+
+# Merge sort
+# numbers: list
+# i: first index
+# k: last index
+def merge_sort(numbers, i, k):
+    j = 0
+
+    if i < k:
+        j = (i + k) // 2  # Find the midpoint in the partition
+
+        # Recursively sort left and right partitions
+        merge_sort(numbers, i, j)
+        merge_sort(numbers, j + 1, k)
+
+        # Merge left and right partition in sorted order
+        merge(numbers, i, j, k)
 
 
 if __name__ == "__main__":
