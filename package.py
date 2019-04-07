@@ -1,6 +1,9 @@
 class Package:
 
     # Constructor for a new Package object.
+    # TODO:
+    #  Add a boolean for combined_pkg.
+    #  Fix constructor with implementation of Truck class
     def __init__(self, pkg_id, address, weight):
         self.pkg_id = pkg_id
         self.address = address
@@ -23,6 +26,7 @@ class Package:
     # Set specific truck requirement
     def set_truck(self, truck):
         self.truck = truck
+        # TODO: Add logic to set truck requirement for combined packages
 
     # Set combined packages requirement
     def set_combined_pkg(self, list):

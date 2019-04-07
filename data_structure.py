@@ -1,7 +1,7 @@
 # Node class
 class Node:
-    def __init__(self, initial_data):
-        self.data = initial_data
+    def __init__(self, address):
+        self.data = address
         self.next = None
 
 

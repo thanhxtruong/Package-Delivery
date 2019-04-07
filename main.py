@@ -5,6 +5,7 @@ from datetime import time
 from package import Package
 from address import Address
 from graph import Vertex, Graph
+from truck import Truck
 
 
 def load_pkg_data(filename):
@@ -14,7 +15,7 @@ def load_pkg_data(filename):
         # Skip the header
         next(readCSV)
         for row in readCSV:
-            print(row)
+            # print(row)
             # Create an address obj
             address = Address(row[1], row[2], row[3], row[4])
             package = Package(row[0], address, row[5])
@@ -35,18 +36,35 @@ def load_pkg_data(filename):
                 minute = int(split_time[1].split(' ')[0])
                 pickup_time = time(hour, minute, 0)
                 package.set_pickup_time(pickup_time)
+                # TODO: Save all packages with pickup_time into the pickup_list
 
             # Set specific truck requirement
             if not (row[8] == ''):
                 package.set_truck(row[8])
 
             # Set combined packages requirement
+            # TODO: Change combined_pkg_list to a set implementation
             combined_pkg_list = []
             if not (row[9] == ''):
                 split_list = row[9].split(',')
                 for item in split_list:
                     combined_pkg_list.append(item)
                 package.set_combined_pkg(combined_pkg_list)
+
+    # TODO:
+    #  Add each package to a list.
+    #  Iterate through the list and set truck requirement using combined_pkg_set.
+    #  Return the pkg_list.
+    return []
+
+def create_dest_priority(pkg_list):
+
+    # TODO: Dump data for packages into a LinkedList with each Node holding an address and data including a list of all packages that need to deliver to that address
+    # TODO:
+    #  Sort data into a priority queue using MinHeap.
+    #  Packages with combined_pkg set to True will have the same Priority#
+
+    return[]
 
 
 def load_graph(filename):
@@ -59,7 +77,7 @@ def load_graph(filename):
         # Skip the header
         next(readCSV)
         for row in readCSV:
-            print(row)
+            # print(row)
             # Get the address (first element) then split it by ','.
             # The result is another array of address data
             split_address = row[0].split(',')
@@ -89,11 +107,58 @@ def load_graph(filename):
                     graph.add_undirected_edge(vertex, vertex_list[address_list_index], distance)
                     address_list_index += 1
 
-            graph.print_graph()
+            # graph.print_graph()
+    return graph
+
+
+# TODO: Implement pseudocode
+def assign_truck (destination):
+    # for package in destination -> pkg_list
+    # if (package -> truck is not None)
+    #     for truck in trucks
+    #         if (truck = package -> truck)
+    #             return truck
+    # else
+    #     for truck in trucks
+    #         if (MAX_PKG - len(truck -> route)) >= len(temp_list)
+            return None
 
 
 if __name__ == "__main__":
+    trucks = []
+    #TODO: create a Truck class that includes name, current_location, and route[] for each truck
+
+    # Load data for packages and save them into a priority queue.
+    # Priority is assigned based on deadline.
+    # Packages with combined packages constraint have the same Priority #
     pkg_filename = input("Enter name of package data file: ")
-    load_pkg_data(pkg_filename)
+    pkg_list = load_pkg_data(pkg_filename)
+    dest_priority_queue = create_dest_priority(pkg_list)
+
+    # Load data from distance table and save them into an undirected graph
     dist_filename = input("Enter name of distance data file: ")
-    load_graph(dist_filename)
+    graph = load_graph(dist_filename)
+
+    # Create trucks and add to HUB location in graph
+    i = 1
+    while i < 4:
+        truck = Truck('Truck ' + str(i))
+        graph.add_truck_to_hub(truck)
+        i += 1
+
+    # while (length of dest_priority_queue is >= 0)
+    #     pkgs_to_deliver = []
+    #     temp_list = []
+    #     ready = False
+    #
+    #     destination = Pop dest_priority_queue
+    #     truck = assign_truck(current_destination)
+    #
+    #     route = graph.get_shortest_path(truck -> current_location, destination)
+    #     Add route to truck -> route
+
+
+
+
+
+
