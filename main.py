@@ -2,37 +2,52 @@
 
 import csv
 from datetime import time
-from package import Package
+from package import Package, Deadline
 from address import Address
 from graph import Vertex, Graph
 from truck import Truck
 from data_structure import Set
 
+address_dict = {}                   # Dictionary to hold (address/address_id) pairs
+pkg_dict = {}                       # Dictionary to hold (address_id/[packages]) pairs
+deadline_set = Set()                # Set of delivery deadlines used to set Priority
+
 
 def load_pkg_data(filename):
-    # pkg_list = []
-    pkg_dict = {}
-    address_keys = Set()
     # Open file, read package data one line at a time skipping the first row (header).
     with open(filename) as csvfile:
         readCSV = csv.reader(csvfile)
         # Skip the header
         next(readCSV)
+        index = 1                       # Index for address_dict key/value pair
         for row in readCSV:
             # print(row)
             # Create an address obj
+            # Add address to address_dict and retrieve the corresponding address_id
             address = Address(row[1], row[2], row[3], row[4])
-            package = Package(row[0], address, row[5])
+            if address not in address_dict.keys():
+                address_dict[address] = index
+                address_id = index
+                index += 1
+            else:
+                address_id = address_dict.get(address)
+
+            # Create package obj
+            package = Package(row[0], address_id, row[5])
+
             # Set delivery deadline
             # Deadline is hardcoded to 23:00:00 if set to 'EOD'
             if row[6] == 'EOD':
-                package.add_delivery_deadline(time(23, 0, 0))
+                deadline = Deadline(time(23, 0, 0))
+                package.add_delivery_deadline(deadline)
+                deadline_set.add(deadline)
             else:
                 split_time = row[6].split(':')
                 hour = int(split_time[0])
                 # Split string again to remove 'AM'/'PM'
                 minute = int(split_time[1].split(' ')[0])
-                deadline = time(hour, minute, 0)
+                deadline = Deadline(time(hour, minute, 0))
+                deadline_set.add(deadline)
                 package.add_delivery_deadline(deadline)
 
             # Set pickup time
@@ -65,11 +80,18 @@ def load_pkg_data(filename):
                 pkg_list = pkg_dict.get(package.address)
                 pkg_list.append(package)
 
+    # for key in address_dict.keys():
+    #     print(key.address1 + ' -> ', end='')
+    #     print(address_dict.get(key))
+    #     print("==============================")
+
     for key in pkg_dict.keys():
         print(key)
         for package in pkg_dict.get(key):
             print(package)
         print("==============================")
+
+    deadline_set.show_set()
 
     # Add package to pkg_list
     # pkg_list.append(package)
@@ -95,6 +117,11 @@ def create_dest_priority(pkg_list):
     # TODO:
     #  Sort data into a priority queue using MinHeap.
     #  Packages with combined_pkg set to True will have the same Priority#
+    priority = 1
+    for deadline in deadline_set:
+        deadline.priority = priority
+        priority += 1
+        print(deadline)
 
     return []
 
@@ -218,8 +245,8 @@ if __name__ == "__main__":
     # Priority is assigned based on deadline.
     # Packages with combined packages constraint have the same Priority #
     pkg_filename = input("Enter name of package data file: ")
-    pkg_list = load_pkg_data(pkg_filename)
-    dest_priority_queue = create_dest_priority(pkg_list)
+    pkg_dict = load_pkg_data(pkg_filename)
+    dest_priority_queue = create_dest_priority(pkg_dict)
 
     # Load data from distance table and save them into an undirected graph
     dist_filename = input("Enter name of distance data file: ")
