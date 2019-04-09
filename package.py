@@ -5,7 +5,7 @@ class Deadline:
         self.priority = None
 
     def __str__(self):
-        return self.deadline, self.priority
+        return str(self.deadline) + " -> " + str(self.priority)
 
     def __eq__(self, other):
         if isinstance(other, Deadline):
@@ -34,8 +34,11 @@ class Deadline:
         else:
             return NotImplemented
 
-    # def __hash__(self):
-    #     return hash(self.deadline, self.priority)
+    def __hash__(self):
+        return hash(self.deadline)
+
+    def set_priority(self, priority):
+        self.priority = priority
 
 
 class Package:
@@ -44,9 +47,9 @@ class Package:
     # TODO:
     #  Add a boolean for combined_pkg.
     #  Fix constructor with implementation of Truck class
-    def __init__(self, pkg_id, address, weight):
+    def __init__(self, pkg_id, address_id, weight):
         self.pkg_id = pkg_id
-        self.address = address
+        self.address_id = address_id
         self.weight = weight
 
         # Initialize deadline, pickup time, required truck, and combined_pkg to None
@@ -57,7 +60,7 @@ class Package:
 
     # Override method to print package by ID and deadline
     def __str__(self):
-        return self.pkg_id + " " + str(self.deadline)
+        return self.pkg_id + " " + str(self.deadline.deadline)
 
     # Override equality comparison to compare based on delivery deadline
     def __eq__(self, other):
@@ -86,6 +89,9 @@ class Package:
             return self.deadline > other.deadline
         else:
             return NotImplemented
+
+    def __len__(self):
+        return len(self.pkg_id)
 
     # Set delivery deadline
     def add_delivery_deadline(self, deadline):

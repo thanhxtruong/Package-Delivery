@@ -1,16 +1,18 @@
 # Name: Thanh Truong. StudentID: #001062385
 
 import csv
+
 from datetime import time
+from queue import PriorityQueue
 from package import Package, Deadline
 from address import Address
 from graph import Vertex, Graph
 from truck import Truck
-from data_structure import Set
 
-address_dict = {}                   # Dictionary to hold (address/address_id) pairs
-pkg_dict = {}                       # Dictionary to hold (address_id/[packages]) pairs
-deadline_set = Set()                # Set of delivery deadlines used to set Priority
+address_dict = {}                           # Dictionary to hold (address/address_id) pairs
+pkg_dict = {}                               # Dictionary to hold (address_id/[packages]) pairs
+deadline_set = set()                        # Set of delivery deadlines used to set Priority
+dest_priority_queue = PriorityQueue()       # Priority queue organized by address_id and priority
 
 
 def load_pkg_data(filename):
@@ -37,6 +39,7 @@ def load_pkg_data(filename):
 
             # Set delivery deadline
             # Deadline is hardcoded to 23:00:00 if set to 'EOD'
+            # Add each unique deadline to the deadline_set
             if row[6] == 'EOD':
                 deadline = Deadline(time(23, 0, 0))
                 package.add_delivery_deadline(deadline)
@@ -74,36 +77,32 @@ def load_pkg_data(filename):
                 package.set_combined_pkg(combined_pkg_list)
 
             # Add package to dictionary
-            if package.address not in pkg_dict.keys():
-                pkg_dict[package.address] = [package]
+            if package.address_id not in pkg_dict.keys():
+                pkg_dict[package.address_id] = [package]
             else:
-                pkg_list = pkg_dict.get(package.address)
+                pkg_list = pkg_dict.get(package.address_id)
                 pkg_list.append(package)
 
+    # Print address and corresponding address_id
     # for key in address_dict.keys():
     #     print(key.address1 + ' -> ', end='')
     #     print(address_dict.get(key))
     #     print("==============================")
 
+    # print("Printing set")
+    # for item in deadline_set:
+    #     print(item)
+
+    # Print pkg_dict
     for key in pkg_dict.keys():
-        print(key)
-        for package in pkg_dict.get(key):
+        print("address_id key: " + str(key))
+        package_list = pkg_dict.get(key)
+        for package in package_list:
+            print("Package: ", end='')
             print(package)
-        print("==============================")
-
-    deadline_set.show_set()
-
-    # Add package to pkg_list
-    # pkg_list.append(package)
-    # print("UNSORTED")
-    # for package in pkg_list:
-    #     print(package)
-    # print("==============================================================")
-    # Sort list of packages by deadline
-    # merge_sort(pkg_list, 0, len(pkg_list) - 1)
-    # print("SORTED")
-    # for package in pkg_list:
-    #     print(package)
+        print("===============================================")
+    print('')
+    print("End of pkg_dict")
 
     # TODO:
     #  Add each package to a list.
@@ -117,12 +116,62 @@ def create_dest_priority(pkg_list):
     # TODO:
     #  Sort data into a priority queue using MinHeap.
     #  Packages with combined_pkg set to True will have the same Priority#
+
+    # Iterate through the set of all deadlines and assign priority
     priority = 1
     for deadline in deadline_set:
         deadline.priority = priority
         priority += 1
-        print(deadline)
 
+    # Iterate through pkg_dict (address_id/[packages]).
+    # For each list of packages, sort the list to find the earliest deadline.
+    # Assign priority
+    for key in pkg_dict.keys():
+
+        package_list = pkg_dict.get(key)
+        if len(package_list) > 1:
+            selection_sort(package_list)
+
+        index = 0
+        for package in package_list:
+            if index == 0:
+                earliest_package = package.deadline
+            index += 1
+
+        for deadline in deadline_set:
+            if deadline == earliest_package:
+                priority = deadline.priority
+
+        dest_priority_queue.put((priority, package.address_id))
+
+    print("Printing destination priority queue")
+    while not dest_priority_queue.empty():
+        next_item = dest_priority_queue.get()
+        print(next_item)
+
+    # for key in pkg_dict.keys():
+    #
+    #     package_list = pkg_dict.get(key)
+    #     if len(package_list) > 1:
+    #         selection_sort(package_list)
+    #
+    #     index = 0
+    #     for package in package_list:
+    #         if index == 0:
+    #             earliest_package = package.deadline
+    #         index += 1
+    #
+    #     for deadline in deadline_set:
+    #         if deadline == earliest_package:
+    #             priority = deadline.priority
+    #
+    #     # Create a new node
+    #     node = Node(key, priority)
+    #     # Create a priority queue with each Node holding an address_id
+    #     dest_priority_queue.insert(node)
+    #
+    # print("Printing destination priority queue")
+    # dest_priority_queue.show()
     return []
 
 
@@ -235,6 +284,28 @@ def merge_sort(numbers, i, k):
 
         # Merge left and right partition in sorted order
         merge(numbers, i, j, k)
+
+
+def selection_sort(numbers):
+    # A variable to hold the number of item comparisons
+    comparisons = 0
+
+    for i in range(len(numbers) - 1):
+
+        # Find index of smallest remaining element
+        index_smallest = i
+        for j in range(i + 1, len(numbers)):
+
+            comparisons = comparisons + 1
+            if numbers[j] < numbers[index_smallest]:
+                index_smallest = j
+
+        # Swap numbers[i] and numbers[index_smallest]
+        temp = numbers[i]
+        numbers[i] = numbers[index_smallest]
+        numbers[index_smallest] = temp
+
+    return comparisons
 
 
 if __name__ == "__main__":
