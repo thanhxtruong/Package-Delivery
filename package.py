@@ -4,8 +4,8 @@ class Deadline:
         self.deadline = time
         self.priority = None
 
-    def __str__(self):
-        return str(self.deadline) + " -> " + str(self.priority)
+    # def __str__(self):
+    #     return str(self.deadline) + " -> " + str(self.priority)
 
     def __eq__(self, other):
         if isinstance(other, Deadline):

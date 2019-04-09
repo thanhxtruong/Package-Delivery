@@ -103,6 +103,7 @@ def load_pkg_data(filename):
         print("===============================================")
     print('')
     print("End of pkg_dict")
+    print("*****************************************************")
 
     # TODO:
     #  Add each package to a list.
@@ -111,17 +112,27 @@ def load_pkg_data(filename):
     return pkg_dict
 
 
-def create_dest_priority(pkg_list):
+def create_dest_priority(pkg_dict):
     # TODO: Dump data for packages into a LinkedList with each Node holding an address and data including a list of all packages that need to deliver to that address
     # TODO:
     #  Sort data into a priority queue using MinHeap.
     #  Packages with combined_pkg set to True will have the same Priority#
 
+    # print("Printing set prior to sorting")
+    # for deadline in deadline_set:
+    #     print(deadline.deadline)
+
     # Iterate through the set of all deadlines and assign priority
+    sorted_deadline_set = sorted(deadline_set)
     priority = 1
-    for deadline in deadline_set:
+    print("Printing priority")
+    for deadline in sorted_deadline_set:
+        print(deadline.deadline)
         deadline.priority = priority
+        print("Priority: " + str(priority))
+        print("==============================================")
         priority += 1
+    print("End of printing priority")
 
     # Iterate through pkg_dict (address_id/[packages]).
     # For each list of packages, sort the list to find the earliest deadline.
@@ -149,29 +160,6 @@ def create_dest_priority(pkg_list):
         next_item = dest_priority_queue.get()
         print(next_item)
 
-    # for key in pkg_dict.keys():
-    #
-    #     package_list = pkg_dict.get(key)
-    #     if len(package_list) > 1:
-    #         selection_sort(package_list)
-    #
-    #     index = 0
-    #     for package in package_list:
-    #         if index == 0:
-    #             earliest_package = package.deadline
-    #         index += 1
-    #
-    #     for deadline in deadline_set:
-    #         if deadline == earliest_package:
-    #             priority = deadline.priority
-    #
-    #     # Create a new node
-    #     node = Node(key, priority)
-    #     # Create a priority queue with each Node holding an address_id
-    #     dest_priority_queue.insert(node)
-    #
-    # print("Printing destination priority queue")
-    # dest_priority_queue.show()
     return []
 
 
@@ -316,8 +304,8 @@ if __name__ == "__main__":
     # Priority is assigned based on deadline.
     # Packages with combined packages constraint have the same Priority #
     pkg_filename = input("Enter name of package data file: ")
-    pkg_dict = load_pkg_data(pkg_filename)
-    dest_priority_queue = create_dest_priority(pkg_dict)
+    load_pkg_data(pkg_filename)
+    create_dest_priority(pkg_dict)
 
     # Load data from distance table and save them into an undirected graph
     dist_filename = input("Enter name of distance data file: ")
@@ -330,7 +318,7 @@ if __name__ == "__main__":
         graph.add_truck_to_hub(truck)
         i += 1
 
-    # while (length of dest_priority_queue is >= 0)
+    # while (length of dest_priority_queue >= 0)
     #     pkgs_to_deliver = []
     #     temp_list = []
     #     ready = False
