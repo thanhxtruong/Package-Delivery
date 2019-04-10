@@ -9,7 +9,13 @@ class Vertex:
 
     def add_truck(self, truck):
         self.trucks.append(truck)
-        truck.set_start_location(self)
+
+    def search_truck(self, truck):
+        for truck_iter in self.trucks:
+            if truck_iter == truck:
+                return self
+            else:
+                return None
 
 
 class Graph:
@@ -33,6 +39,11 @@ class Graph:
     def add_undirected_edge(self, vertex_a, vertex_b, weight=1):
         self.add_directed_edge(vertex_a, vertex_b, weight)
         self.add_directed_edge(vertex_b, vertex_a, weight)
+
+    def find_truck(self, truck):
+        for vertex in self.adjacency_list.keys():
+            if truck in vertex.trucks:
+                print(vertex.trucks)
 
     # TODO Verify this function work
     def dijkstra_shortest_path(g, start_vertex):

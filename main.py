@@ -65,7 +65,7 @@ def load_pkg_data(filename):
 
             # Set specific truck requirement
             if not (row[8] == ''):
-                package.set_truck(row[8])
+                package.set_truck(int(row[8]))
 
             # Set combined packages requirement
             # TODO: Change combined_pkg_list to a set implementation
@@ -134,6 +134,7 @@ def create_dest_priority(pkg_dict):
         priority += 1
     print("End of printing priority")
 
+    # TODO: Change to sorted() method
     # Iterate through pkg_dict (address_id/[packages]).
     # For each list of packages, sort the list to find the earliest deadline.
     # Assign priority
@@ -203,12 +204,13 @@ def load_graph(filename):
                     graph.add_undirected_edge(vertex, vertex_list[address_list_index], distance)
                     address_list_index += 1
 
-            # graph.print_graph()
+            graph.print_graph()
     return graph
 
 
 # TODO: Implement pseudocode
-def assign_truck(destination):
+def assign_truck(dest_list):
+
     # for package in destination -> pkg_list
     # if (package -> truck is not None)
     #     for truck in trucks
@@ -298,7 +300,6 @@ def selection_sort(numbers):
 
 if __name__ == "__main__":
     trucks = []
-    # TODO: create a Truck class that includes name, current_location, and route[] for each truck
 
     # Load data for packages and save them into a priority queue.
     # Priority is assigned based on deadline.
@@ -308,18 +309,21 @@ if __name__ == "__main__":
     create_dest_priority(pkg_dict)
 
     # Load data from distance table and save them into an undirected graph
-    # dist_filename = input("Enter name of distance data file: ")
-    # graph = load_graph(dist_filename)
+    dist_filename = input("Enter name of distance data file: ")
+    graph = load_graph(dist_filename)
 
     # Create trucks and add to HUB location in graph
-    # i = 1
-    # while i < 4:
-    #     truck = Truck('Truck ' + str(i))
-    #     graph.add_truck_to_hub(truck)
-    #     i += 1
+    i = 1
+    while i < 4:
+        truck = Truck(i)
+        trucks.append(truck)
+        graph.add_truck_to_hub(truck)
+        i += 1
 
     while not dest_priority_queue.empty():
-        # List of all destinations to be routed in sequence in the case of packages that are required to be delivered together
+        required_truck = None
+        # List of all destinations to be routed in sequence
+        # in the case of packages that are required to be delivered together
         dest_list = []
         # Pop the next item from queue
         next_dest = dest_priority_queue.get()
@@ -339,33 +343,40 @@ if __name__ == "__main__":
         # (destination) once the package_id matches that from the
         # same_route_pkg_list.
         for package in same_dest_pkg_list:
+            # Set required_truck for package if any
+            if required_truck is None:
+                required_truck = package.truck
             if len(package.combined_pkg) > 1:
                 same_route_pkg_list = package.combined_pkg
                 for same_route_index in same_route_pkg_list:
                     for key in pkg_dict.keys():
                         pkg_list_from_dict = pkg_dict.get(key)
 
-                        # print("Finding packages...")
+                        # Iterate through each list of packages from the dictionary to find the matching package_id
+                        # and return te corresponding address_id (key)
                         for i in range(len(pkg_list_from_dict)):
                             package = pkg_list_from_dict[i]
                             if int(package.pkg_id) == same_route_index:
                                 # Add the next destination to the list
                                 dest_list.append(key)
-                        #         print("The next destination should be: " + str(key), end='')
-                        #         print(" to deliver package # " + package.pkg_id)
-                        # print("===================================")
+                                # Set required_truck for package if any
+                                if required_truck is None:
+                                    required_truck = package.truck
+
         print("At the end, these are all destination that needs to be delivered in sequence")
         for destination in dest_list:
             print(destination)
         print("=========================================")
 
-    # while (length of dest_priority_queue >= 0)
-    #     pkgs_to_deliver = []
-    #     temp_list = []
-    #     ready = False
-    #
-    #     destination = Pop dest_priority_queue
-    #     truck = assign_truck(current_destination)
-    #
-    #     route = graph.get_shortest_path(truck -> current_location, destination)
-    #     Add route to truck -> route
+        # TODO: Change this algorithm. Currently hard-coded to Truck 1 for testing
+        for truck in trucks:
+            if required_truck is None:
+                selected_truck = trucks[0]
+                break
+            else:
+                if truck.name == required_truck:
+                    selected_truck = truck
+                    break
+
+        # Start here
+        truck_location = graph.find_truck(required_truck)
