@@ -73,7 +73,7 @@ def load_pkg_data(filename):
             if not (row[9] == ''):
                 split_list = row[9].split(',')
                 for item in split_list:
-                    combined_pkg_list.append(item)
+                    combined_pkg_list.append(int(item))
                 package.set_combined_pkg(combined_pkg_list)
 
             # Add package to dictionary
@@ -155,10 +155,10 @@ def create_dest_priority(pkg_dict):
 
         dest_priority_queue.put((priority, package.address_id))
 
-    print("Printing destination priority queue")
-    while not dest_priority_queue.empty():
-        next_item = dest_priority_queue.get()
-        print(next_item)
+    # print("Printing destination priority queue")
+    # while not dest_priority_queue.empty():
+    #     next_item = dest_priority_queue.get()
+    #     print(next_item)
 
     return []
 
@@ -308,15 +308,56 @@ if __name__ == "__main__":
     create_dest_priority(pkg_dict)
 
     # Load data from distance table and save them into an undirected graph
-    dist_filename = input("Enter name of distance data file: ")
-    graph = load_graph(dist_filename)
+    # dist_filename = input("Enter name of distance data file: ")
+    # graph = load_graph(dist_filename)
 
     # Create trucks and add to HUB location in graph
-    i = 1
-    while i < 4:
-        truck = Truck('Truck ' + str(i))
-        graph.add_truck_to_hub(truck)
-        i += 1
+    # i = 1
+    # while i < 4:
+    #     truck = Truck('Truck ' + str(i))
+    #     graph.add_truck_to_hub(truck)
+    #     i += 1
+
+    while not dest_priority_queue.empty():
+        # List of all destinations to be routed in sequence in the case of packages that are required to be delivered together
+        dest_list = []
+        # Pop the next item from queue
+        next_dest = dest_priority_queue.get()
+        # Append it to the list
+        dest_list.append(next_dest[1])
+        # print("Destination: " + str(next_dest[1]))
+        # Get the list of all packages that are required to be delivered
+        # to this next destination.
+        same_dest_pkg_list = pkg_dict.get(next_dest[1])
+
+        # For each package in the same_dest_pkg_list, get the list of packages
+        # that are required to be delivered together (if any) using the same route.
+        # For each package in this "same_route" list, iterate through the package
+        # dictionary and get the list of all packages for the corresponding
+        # destination from the dictionary.
+        # Finally, for each package inside this list from dict, return the key
+        # (destination) once the package_id matches that from the
+        # same_route_pkg_list.
+        for package in same_dest_pkg_list:
+            if len(package.combined_pkg) > 1:
+                same_route_pkg_list = package.combined_pkg
+                for same_route_index in same_route_pkg_list:
+                    for key in pkg_dict.keys():
+                        pkg_list_from_dict = pkg_dict.get(key)
+
+                        # print("Finding packages...")
+                        for i in range(len(pkg_list_from_dict)):
+                            package = pkg_list_from_dict[i]
+                            if int(package.pkg_id) == same_route_index:
+                                # Add the next destination to the list
+                                dest_list.append(key)
+                        #         print("The next destination should be: " + str(key), end='')
+                        #         print(" to deliver package # " + package.pkg_id)
+                        # print("===================================")
+        print("At the end, these are all destination that needs to be delivered in sequence")
+        for destination in dest_list:
+            print(destination)
+        print("=========================================")
 
     # while (length of dest_priority_queue >= 0)
     #     pkgs_to_deliver = []
