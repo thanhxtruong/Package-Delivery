@@ -9,10 +9,75 @@ from address import Address
 from graph import Vertex, Graph
 from truck import Truck
 
-address_dict = {}                           # Dictionary to hold (address/address_id) pairs
-pkg_dict = {}                               # Dictionary to hold (address_id/[packages]) pairs
-deadline_set = set()                        # Set of delivery deadlines used to set Priority
-dest_priority_queue = PriorityQueue()       # Priority queue organized by address_id and priority
+# Dictionary to hold (address/address_id) pairs
+address_dict = {}
+# Dictionary to hold (address_id/[packages]) pairs
+pkg_dict = {}
+# Set of delivery deadlines used to set Priority
+deadline_set = set()
+# Priority queue organized by address_id and priority
+dest_priority_queue = PriorityQueue()
+# List of all graph with vertices representing packages that are to be delivered together in the same route
+same_route_graph_list = []
+# List of all vertices in graph
+vertex_list = []
+graph = Graph()
+
+
+def load_graph(filename):
+
+    # Open file, read package data one line at a time skipping the first row (header).
+    with open(filename) as csvfile:
+        index = 1  # Index for address_dict key/value pair
+        readCSV = csv.reader(csvfile)
+        # Skip the header
+        next(readCSV)
+        for row in readCSV:
+            # print(row)
+            # Get the address (first element) then split it by ','.
+            # The result is another array of address data
+            split_address = row[0].split(',')
+            address1 = split_address[0]
+            city = split_address[1]
+            zip_code = split_address[2]
+            state = split_address[3]
+            address = Address(address1, city, zip_code, state)
+            # Add address to address_dict
+            address_dict[address] = index
+            index += 1
+
+            _vertex = Vertex(address)
+            vertex_list.append(_vertex)
+
+            # Extract distance data from the input string and save into a list
+            j = 1
+            dist_list = []
+            while not float(row[j]) == 0:
+                dist_list.append(row[j])
+                j += 1
+
+            # Add vertex to graph.
+            # Save distances into the adjacency list for the new vertex
+            graph.add_vertex(_vertex, dist_list)
+
+            # Add undirected edges to graph
+            for _vertex, adj_list in graph.adjacency_list.items():
+                address_list_index = 0
+                for distance in adj_list:
+                    graph.add_undirected_edge(_vertex, vertex_list[address_list_index], distance)
+                    address_list_index += 1
+
+            # graph.print_graph()
+    return graph
+
+
+# This function iterates through the address_dict{} and returns the address_id (key) for a given set of string values
+# for (state, zipCode, city, address1)
+def get_address_from_address_dict(address1, city, zipCode, state):
+    for address_obj, address_id in address_dict.items():
+        address = address_obj
+        if address.compare_address(address1, city, zipCode, state):
+            return address_id, address_obj
 
 
 def load_pkg_data(filename):
@@ -21,67 +86,63 @@ def load_pkg_data(filename):
         readCSV = csv.reader(csvfile)
         # Skip the header
         next(readCSV)
-        index = 1                       # Index for address_dict key/value pair
+
         for row in readCSV:
             # print(row)
-            # Create an address obj
-            # Add address to address_dict and retrieve the corresponding address_id
-            address = Address(row[1], row[2], row[3], row[4])
-            if address not in address_dict.keys():
-                address_dict[address] = index
-                address_id = index
-                index += 1
-            else:
-                address_id = address_dict.get(address)
+
+            # Get address_id from address_dict{}
+            address_tuple = get_address_from_address_dict(row[1], row[2], row[3], row[4])
+            _address_id = address_tuple[0]
 
             # Create package obj
-            package = Package(row[0], address_id, row[5])
+            package = Package(row[0], _address_id, row[5])
 
             # Set delivery deadline
             # Deadline is hardcoded to 23:00:00 if set to 'EOD'
-            # Add each unique deadline to the deadline_set
+
             if row[6] == 'EOD':
                 deadline = Deadline(time(23, 0, 0))
-                package.add_delivery_deadline(deadline)
-                deadline_set.add(deadline)
+
             else:
                 split_time = row[6].split(':')
                 hour = int(split_time[0])
                 # Split string again to remove 'AM'/'PM'
                 minute = int(split_time[1].split(' ')[0])
                 deadline = Deadline(time(hour, minute, 0))
-                deadline_set.add(deadline)
-                package.add_delivery_deadline(deadline)
 
-            # Set pickup time
-            if not (row[7] == ''):
-                split_time = row[7].split(':')
-                hour = int(split_time[0])
-                # Split string again to remove 'AM'/'PM'
-                minute = int(split_time[1].split(' ')[0])
-                pickup_time = time(hour, minute, 0)
-                package.set_pickup_time(pickup_time)
-                # TODO: Save all packages with pickup_time into the pickup_list
+            # Add each unique deadline to the deadline_set and package
+            package.add_delivery_deadline(deadline)
+            deadline_set.add(deadline)
 
             # Set specific truck requirement
             if not (row[8] == ''):
                 package.set_truck(int(row[8]))
 
             # Set combined packages requirement
-            # TODO: Change combined_pkg_list to a set implementation
             combined_pkg_list = []
             if not (row[9] == ''):
+                same_route_graph = Graph()
+                from_vertex = Vertex(package.pkg_id)
                 split_list = row[9].split(',')
                 for item in split_list:
-                    combined_pkg_list.append(int(item))
-                package.set_combined_pkg(combined_pkg_list)
+                    to_vertex = Vertex(int(item))
+                    combined_pkg_list.append(to_vertex)
+                same_route_graph.add_vertex(from_vertex, combined_pkg_list)
+                # Add undirected edges to graph
+                for from_vertex, adj_list in same_route_graph.adjacency_list.items():
+                    for package in adj_list:
+                        same_route_graph.add_undirected_edge(from_vertex, package)
 
+                same_route_graph_list.append(same_route_graph)
+
+        for package_graph in same_route_graph_list:
+            package_graph.print_graph()
             # Add package to dictionary
-            if package.address_id not in pkg_dict.keys():
-                pkg_dict[package.address_id] = [package]
-            else:
-                pkg_list = pkg_dict.get(package.address_id)
-                pkg_list.append(package)
+            # if package.address_id not in pkg_dict.keys():
+            #     pkg_dict[package.address_id] = [package]
+            # else:
+            #     pkg_list = pkg_dict.get(package.address_id)
+            #     pkg_list.append(package)
 
     # Print address and corresponding address_id
     # for key in address_dict.keys():
@@ -164,64 +225,6 @@ def create_dest_priority(pkg_dict):
     return []
 
 
-def load_graph(filename):
-    vertex_list = []
-    graph = Graph()
-
-    # Open file, read package data one line at a time skipping the first row (header).
-    with open(filename) as csvfile:
-        readCSV = csv.reader(csvfile)
-        # Skip the header
-        next(readCSV)
-        for row in readCSV:
-            # print(row)
-            # Get the address (first element) then split it by ','.
-            # The result is another array of address data
-            split_address = row[0].split(',')
-            address1 = split_address[0]
-            city = split_address[1]
-            zip_code = split_address[2]
-            state = split_address[3]
-            address = Address(address1, city, zip_code, state)
-            vertex = Vertex(address)
-            vertex_list.append(vertex)
-
-            # Extract distance data from the input string and save into a list
-            i = 1
-            dist_list = []
-            while not float(row[i]) == 0:
-                dist_list.append(row[i])
-                i += 1
-
-            # Add vertex to graph.
-            # Save distances into the adjacency list for the new vertex
-            graph.add_vertex(vertex, dist_list)
-
-            # Add undirected edges to graph
-            for vertex, list in graph.adjacency_list.items():
-                address_list_index = 0
-                for distance in list:
-                    graph.add_undirected_edge(vertex, vertex_list[address_list_index], distance)
-                    address_list_index += 1
-
-            graph.print_graph()
-    return graph
-
-
-# TODO: Implement pseudocode
-def assign_truck(dest_list):
-
-    # for package in destination -> pkg_list
-    # if (package -> truck is not None)
-    #     for truck in trucks
-    #         if (truck = package -> truck)
-    #             return truck
-    # else
-    #     for truck in trucks
-    #         if (MAX_PKG - len(truck -> route)) >= len(temp_list)
-    return None
-
-
 # Merge sort algorithm
 def merge(numbers, i, j, k):
     merged_size = k - i + 1  # Size of merged partition
@@ -299,14 +302,8 @@ def selection_sort(numbers):
 
 
 if __name__ == "__main__":
+    # TODO: Modify sorted() using attrgetter (dijkstra)
     trucks = []
-
-    # Load data for packages and save them into a priority queue.
-    # Priority is assigned based on deadline.
-    # Packages with combined packages constraint have the same Priority #
-    pkg_filename = input("Enter name of package data file: ")
-    load_pkg_data(pkg_filename)
-    create_dest_priority(pkg_dict)
 
     # Load data from distance table and save them into an undirected graph
     dist_filename = input("Enter name of distance data file: ")
@@ -319,6 +316,18 @@ if __name__ == "__main__":
         trucks.append(truck)
         graph.add_truck_to_hub(truck)
         i += 1
+
+    # print("Printing truck location")
+    # graph.find_truck(1)
+    # graph.find_truck(2)
+    # graph.find_truck(3)
+
+    # Load data for packages and save them into a priority queue.
+    # Priority is assigned based on deadline.
+    # Packages with combined packages constraint have the same Priority #
+    pkg_filename = input("Enter name of package data file: ")
+    load_pkg_data(pkg_filename)
+    create_dest_priority(pkg_dict)
 
     while not dest_priority_queue.empty():
         required_truck = None
@@ -379,4 +388,8 @@ if __name__ == "__main__":
                     break
 
         # Start here
-        truck_location = graph.find_truck(required_truck)
+        for address_id in dest_list:
+            vertex = graph.get_vertex(address_id)
+        # truck_location = trucks[0].current_location
+        # print(truck_location)
+        # truck_location = graph.find_truck(required_truck)

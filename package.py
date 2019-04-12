@@ -44,17 +44,13 @@ class Deadline:
 class Package:
 
     # Constructor for a new Package object.
-    # TODO:
-    #  Add a boolean for combined_pkg.
-    #  Fix constructor with implementation of Truck class
     def __init__(self, pkg_id, address_id, weight):
         self.pkg_id = pkg_id
         self.address_id = address_id
         self.weight = weight
 
-        # Initialize deadline, pickup time, required truck, and combined_pkg to None
+        # Initialize deadline, required truck, and combined_pkg to None
         self.deadline = None
-        self.pickup_time = None
         self.truck = None
         self.combined_pkg = []
 

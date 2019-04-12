@@ -18,3 +18,11 @@ class Address:
     def __hash__(self):
         return hash((self.address1, self.city, self.zipCode, self.state))
 
+    # This function returns true if the given state, zipCode, city, and address1
+    # match values in the compared address object
+    def compare_address(self, address1, city, zipCode, state):
+        if self.state == state and self.zipCode == zipCode and self.city == city and self.address1 == address1:
+            return True
+        else:
+            return False
+

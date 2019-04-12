@@ -2,6 +2,9 @@
 ID",Address,City ,Zip,State,"Mass
 KILO","Delivery
 Deadline",Pickup,Truck #,Combined Packages
+14,4300 S 1300 E,Millcreek,84117,UT,88,10:30 AM,,,"15,19"
+16,4580 S 2300 E,Holladay,84117,UT,88,10:30 AM,,,"13,19"
+20,3595 Main St,Salt Lake City,84115,UT,37,10:30 AM,,,"13,15"
 1,195 W Oakland Ave,Salt Lake City,84115,UT,21,10:30 AM,,,
 2,2530 S 500 E,Salt Lake City,84106,UT,44,EOD,,,
 3,233 Canyon Rd,Salt Lake City,84103,UT,2,EOD,,2,
@@ -15,13 +18,10 @@ Deadline",Pickup,Truck #,Combined Packages
 11,2600 Taylorsville Blvd,Salt Lake City,84118,UT,1,EOD,,,
 12,3575 W Valley Central Station bus Loop,West Valley City,84119,UT,1,EOD,,,
 13,2010 W 500 S,Salt Lake City,84104,UT,2,10:30 AM,,,
-14,4300 S 1300 E,Millcreek,84117,UT,88,10:30 AM,,,"15,19"
 15,4580 S 2300 E,Holladay,84117,UT,4,9:00 AM,,2,
-16,4580 S 2300 E,Holladay,84117,UT,88,10:30 AM,,,"13,19"
 17,3148 S 1100 W,Salt Lake City,84119,UT,2,EOD,,,
 18,1488 4800 S,Salt Lake City,84123,UT,6,EOD,,2,
 19,177 W Price Ave,Salt Lake City,84115,UT,37,EOD,,,
-20,3595 Main St,Salt Lake City,84115,UT,37,10:30 AM,,,"13,15"
 21,3595 Main St,Salt Lake City,84115,UT,3,EOD,,,
 22,6351 South 900 East,Murray,84121,UT,2,EOD,,,
 23,5100 South 2700 West,Salt Lake City,84118,UT,5,EOD,,,

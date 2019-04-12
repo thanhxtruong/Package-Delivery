@@ -1,18 +1,20 @@
 class Vertex:
-    def __init__(self, address):
-        self.address = address
-        self.visited = False
-        self.trucks = []
+    def __init__(self, data):
+        self.data = data
+        self.pred_vertex = None
+        distance = float('inf')                 # shortest path distance from start_vertex
+        self.trucks = []                        # all trucks currently at this vertex
+        # TODO: Add pred
 
     # def __str__(self):
     #     return self.address.address1
 
-    def add_truck(self, truck):
-        self.trucks.append(truck)
+    def add_truck(self, truck_id):
+        self.trucks.append(truck_id)
 
-    def search_truck(self, truck):
+    def search_truck(self, truck_id):
         for truck_iter in self.trucks:
-            if truck_iter == truck:
+            if truck_iter == truck_id:
                 return self
             else:
                 return None
@@ -26,8 +28,9 @@ class Graph:
     def add_truck_to_hub(self, truck):
         i = 0
         for vertex in self.adjacency_list.keys():
-            if (i == 0):
-                vertex.add_truck(truck)
+            if i == 0:
+                vertex.add_truck(truck.id)
+                truck.current_location = vertex
                 return
 
     def add_vertex(self, new_vertex, adj_list):
@@ -43,7 +46,13 @@ class Graph:
     def find_truck(self, truck):
         for vertex in self.adjacency_list.keys():
             if truck in vertex.trucks:
-                print(vertex.trucks)
+                print("Truck is currently at")
+                print(vertex.address.address1)
+
+    def get_vertex(self, address_id):
+        for vertex in self.adjacency_list.keys():
+            if vertex.address == address_id:
+                return vertex
 
     # TODO Verify this function work
     def dijkstra_shortest_path(g, start_vertex):
@@ -89,14 +98,12 @@ class Graph:
         return path
 
     def print_graph(self):
-        for vertex, list in self.adjacency_list.items():
-            print(vertex.address.address1, vertex.trucks, list)
+        for vertex, adj_list in self.adjacency_list.items():
+            print(vertex.data)
         print("===========================================")
-        i = 0
         for vertex_tuple, weight in self.edge_weights.items():
             i += 1
             for vertex in vertex_tuple:
-                print(vertex.address.address1, end='')
+                print(vertex.data, end='')
                 print(" --> ", end='')
             print(weight)
-        print(i)
