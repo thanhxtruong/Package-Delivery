@@ -102,7 +102,6 @@ class Graph:
             print(vertex.data)
         print("===========================================")
         for vertex_tuple, weight in self.edge_weights.items():
-            i += 1
             for vertex in vertex_tuple:
                 print(vertex.data, end='')
                 print(" --> ", end='')
