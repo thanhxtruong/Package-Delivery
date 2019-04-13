@@ -1,7 +1,8 @@
 # Name: Thanh Truong. StudentID: #001062385
 
 import csv
-
+import sys
+from inspect import currentframe, getframeinfo
 from datetime import time
 from queue import PriorityQueue
 from package import Package, Deadline
@@ -18,7 +19,7 @@ deadline_set = set()
 # Priority queue organized by address_id and priority
 dest_priority_queue = PriorityQueue()
 # List of all graph with vertices representing packages that are to be delivered together in the same route
-same_route_set_list = []
+same_route_combined_sets = []
 # List of all vertices in graph
 vertex_list = []
 graph = Graph()
@@ -79,8 +80,16 @@ def get_address_from_address_dict(address1, city, zipCode, state):
         if address.compare_address(address1, city, zipCode, state):
             return address_id, address_obj
 
+# This function return address_id for a given pkg_id in the pkg_dict{}
+def get_address_from_pkg_dict(pkg_id):
+    for address_id, pkg_list in pkg_dict.items():
+        for package in pkg_list:
+            if package.pkg_id == pkg_id:
+                return address_id
+
 
 def load_pkg_data(filename):
+    same_route_set_list = []
     # Open file, read package data one line at a time skipping the first row (header).
     with open(filename) as csvfile:
         readCSV = csv.reader(csvfile)
@@ -95,7 +104,7 @@ def load_pkg_data(filename):
             _address_id = address_tuple[0]
 
             # Create package obj
-            package = Package(row[0], _address_id, row[5])
+            package = Package(int(row[0]), _address_id, float(row[5]))
 
             # Set delivery deadline
             # Deadline is hardcoded to 23:00:00 if set to 'EOD'
@@ -120,44 +129,51 @@ def load_pkg_data(filename):
 
             # Set combined packages requirement
             if not (row[9] == ''):
-                same_route_set = set()
-                same_route_set.add(int(package.pkg_id))
+                temp_set = set()
+                temp_set.add(int(package.pkg_id))
                 split_list = row[9].split(',')
                 for item in split_list:
-                    same_route_set.add(int(item))
+                    temp_set.add(int(item))
 
-                same_route_set_list.append(same_route_set)
-
-        print("Printing sets prior to union")
-        for package_set in same_route_set_list:
-            print(package_set)
-
-        same_route_combined_sets = []
-        while len(same_route_set_list) > 0:
-            sets_to_remove = []
-            for index in range(len(same_route_set_list)):
-                if index == 0:
-                    first_set = same_route_set_list[index]
-                    sets_to_remove.append(same_route_set_list[index])
-                else:
-                    if len(first_set.intersection(same_route_set_list[index])) > 0:
-                        sets_to_remove.append(same_route_set_list[index])
-
-            combined_set = set()
-            for index1 in range(len(sets_to_remove)):
-                combined_set = combined_set.union(same_route_set_list[index1])
-            same_route_combined_sets.append(combined_set)
-            for index1 in range(len(sets_to_remove)):
-                same_route_set_list.remove(sets_to_remove[index1])
-
-
+                same_route_set_list.append(temp_set)
 
             # Add package to dictionary
-            # if package.address_id not in pkg_dict.keys():
-            #     pkg_dict[package.address_id] = [package]
-            # else:
-            #     pkg_list = pkg_dict.get(package.address_id)
-            #     pkg_list.append(package)
+            if package.address_id not in pkg_dict.keys():
+                pkg_dict[package.address_id] = [package]
+            else:
+                pkg_list = pkg_dict.get(package.address_id)
+                pkg_list.append(package)
+
+    # Go through list of same_route_sets to combine sets
+    combined_set_list = []
+    while len(same_route_set_list) > 0:
+        sets_to_remove = []
+
+        for index in range(len(same_route_set_list)):
+            if index == 0:
+                first_set = same_route_set_list[index]
+                sets_to_remove.append(same_route_set_list[index])
+            else:
+                if len(first_set.intersection(same_route_set_list[index])) > 0:
+                    sets_to_remove.append(same_route_set_list[index])
+
+        combined_set = set()
+        for index1 in range(len(sets_to_remove)):
+            combined_set = combined_set.union(same_route_set_list[index1])
+        combined_set_list.append(combined_set)
+        for index1 in range(len(sets_to_remove)):
+            same_route_set_list.remove(sets_to_remove[index1])
+
+    # Replace package_id with address_id
+
+    for combined_set in combined_set_list:
+        replaced_set = set()
+        for pkg_id in combined_set:
+            address_id = get_address_from_pkg_dict(pkg_id)
+            replaced_set.add(address_id)
+        same_route_combined_sets.append(replaced_set)
+
+
 
     # Print address and corresponding address_id
     # for key in address_dict.keys():
@@ -169,30 +185,21 @@ def load_pkg_data(filename):
     # for item in deadline_set:
     #     print(item)
 
-    # Print pkg_dict
-    for key in pkg_dict.keys():
-        print("address_id key: " + str(key))
-        package_list = pkg_dict.get(key)
-        for package in package_list:
-            print("Package: ", end='')
-            print(package)
-        print("===============================================")
-    print('')
-    print("End of pkg_dict")
-    print("*****************************************************")
-
-    # TODO:
-    #  Add each package to a list.
-    #  Iterate through the list and set truck requirement using combined_pkg_set.
-    #  Return the pkg_list.
+    # print("Printing pkg_dict{}")
+    # for key in pkg_dict.keys():
+    #     print("address_id key: " + str(key))
+    #     package_list = pkg_dict.get(key)
+    #     for package in package_list:
+    #         print("Package: ", end='')
+    #         print(package)
+    #     print("===============================================")
+    # print('')
+    # print("End of pkg_dict")
+    # print("*****************************************************")
     return pkg_dict
 
 
-def create_dest_priority(pkg_dict):
-    # TODO: Dump data for packages into a LinkedList with each Node holding an address and data including a list of all packages that need to deliver to that address
-    # TODO:
-    #  Sort data into a priority queue using MinHeap.
-    #  Packages with combined_pkg set to True will have the same Priority#
+def prioritize_pkg_dict():
 
     # print("Printing set prior to sorting")
     # for deadline in deadline_set:
@@ -201,14 +208,17 @@ def create_dest_priority(pkg_dict):
     # Iterate through the set of all deadlines and assign priority
     sorted_deadline_set = sorted(deadline_set)
     priority = 1
-    print("Printing priority")
+
+    # frameinfo = getframeinfo(currentframe())
+    # print(frameinfo.filename, frameinfo.lineno, file=sys.stderr)
+    # print("Printing priority", file=sys.stderr)
     for deadline in sorted_deadline_set:
-        print(deadline.deadline)
+        # print(deadline.deadline, file=sys.stderr)
         deadline.priority = priority
-        print("Priority: " + str(priority))
-        print("==============================================")
+        # print("Priority: " + str(priority), file=sys.stderr)
+        # print("==============================================", file=sys.stderr)
         priority += 1
-    print("End of printing priority")
+    # print("End of printing priority", file=sys.stderr)
 
     # TODO: Change to sorted() method
     # Iterate through pkg_dict (address_id/[packages]).
@@ -232,12 +242,12 @@ def create_dest_priority(pkg_dict):
 
         dest_priority_queue.put((priority, package.address_id))
 
-    # print("Printing destination priority queue")
+    print("Printing destination priority queue", file=sys.stderr)
     # while not dest_priority_queue.empty():
     #     next_item = dest_priority_queue.get()
-    #     print(next_item)
+    #     print(next_item, file=sys.stderr)
 
-    return []
+    return dest_priority_queue
 
 
 # Merge sort algorithm
@@ -321,7 +331,8 @@ if __name__ == "__main__":
     trucks = []
 
     # Load data from distance table and save them into an undirected graph
-    dist_filename = input("Enter name of distance data file: ")
+    # dist_filename = input("Enter name of distance data file: ")
+    dist_filename = "distance_table.csv"
     graph = load_graph(dist_filename)
 
     # Create trucks and add to HUB location in graph
@@ -340,71 +351,22 @@ if __name__ == "__main__":
     # Load data for packages and save them into a priority queue.
     # Priority is assigned based on deadline.
     # Packages with combined packages constraint have the same Priority #
-    pkg_filename = input("Enter name of package data file: ")
+    # pkg_filename = input("Enter name of package data file: ")
+    pkg_filename = "package_data.csv"
     load_pkg_data(pkg_filename)
-    create_dest_priority(pkg_dict)
+    prioritize_pkg_dict()
 
     while not dest_priority_queue.empty():
-        required_truck = None
-        # List of all destinations to be routed in sequence
-        # in the case of packages that are required to be delivered together
-        dest_list = []
-        # Pop the next item from queue
-        next_dest = dest_priority_queue.get()
-        # Append it to the list
-        dest_list.append(next_dest[1])
-        # print("Destination: " + str(next_dest[1]))
-        # Get the list of all packages that are required to be delivered
-        # to this next destination.
-        same_dest_pkg_list = pkg_dict.get(next_dest[1])
+        required_truck_id = None
+        dest_in_route = []
 
-        # For each package in the same_dest_pkg_list, get the list of packages
-        # that are required to be delivered together (if any) using the same route.
-        # For each package in this "same_route" list, iterate through the package
-        # dictionary and get the list of all packages for the corresponding
-        # destination from the dictionary.
-        # Finally, for each package inside this list from dict, return the key
-        # (destination) once the package_id matches that from the
-        # same_route_pkg_list.
-        for package in same_dest_pkg_list:
-            # Set required_truck for package if any
-            if required_truck is None:
-                required_truck = package.truck
-            if len(package.combined_pkg) > 1:
-                same_route_pkg_list = package.combined_pkg
-                for same_route_index in same_route_pkg_list:
-                    for key in pkg_dict.keys():
-                        pkg_list_from_dict = pkg_dict.get(key)
+        next_address_id = dest_priority_queue.get()
 
-                        # Iterate through each list of packages from the dictionary to find the matching package_id
-                        # and return te corresponding address_id (key)
-                        for i in range(len(pkg_list_from_dict)):
-                            package = pkg_list_from_dict[i]
-                            if int(package.pkg_id) == same_route_index:
-                                # Add the next destination to the list
-                                dest_list.append(key)
-                                # Set required_truck for package if any
-                                if required_truck is None:
-                                    required_truck = package.truck
+        while next_address_id not in pkg_dict.keys():
+            next_address_id = dest_priority_queue.get()
 
-        print("At the end, these are all destination that needs to be delivered in sequence")
-        for destination in dest_list:
-            print(destination)
-        print("=========================================")
+        dest_in_route.append(next_address_id)
 
-        # TODO: Change this algorithm. Currently hard-coded to Truck 1 for testing
-        for truck in trucks:
-            if required_truck is None:
-                selected_truck = trucks[0]
-                break
-            else:
-                if truck.name == required_truck:
-                    selected_truck = truck
-                    break
-
-        # Start here
-        for address_id in dest_list:
-            vertex = graph.get_vertex(address_id)
-        # truck_location = trucks[0].current_location
-        # print(truck_location)
-        # truck_location = graph.find_truck(required_truck)
+        for same_route_set in same_route_set_list:
+            if next_address_id in same_route_set:
+                dest_in_route.append(same_route_set)
