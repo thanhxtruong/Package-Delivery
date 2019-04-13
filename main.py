@@ -18,7 +18,7 @@ deadline_set = set()
 # Priority queue organized by address_id and priority
 dest_priority_queue = PriorityQueue()
 # List of all graph with vertices representing packages that are to be delivered together in the same route
-same_route_graph_list = []
+same_route_set_list = []
 # List of all vertices in graph
 vertex_list = []
 graph = Graph()
@@ -119,24 +119,39 @@ def load_pkg_data(filename):
                 package.set_truck(int(row[8]))
 
             # Set combined packages requirement
-            combined_pkg_list = []
             if not (row[9] == ''):
-                same_route_graph = Graph()
-                from_vertex = Vertex(package.pkg_id)
+                same_route_set = set()
+                same_route_set.add(int(package.pkg_id))
                 split_list = row[9].split(',')
                 for item in split_list:
-                    to_vertex = Vertex(int(item))
-                    combined_pkg_list.append(to_vertex)
-                same_route_graph.add_vertex(from_vertex, combined_pkg_list)
-                # Add undirected edges to graph
-                for from_vertex, adj_list in same_route_graph.adjacency_list.items():
-                    for package in adj_list:
-                        same_route_graph.add_undirected_edge(from_vertex, package)
+                    same_route_set.add(int(item))
 
-                same_route_graph_list.append(same_route_graph)
+                same_route_set_list.append(same_route_set)
 
-        for package_graph in same_route_graph_list:
-            package_graph.print_graph()
+        print("Printing sets prior to union")
+        for package_set in same_route_set_list:
+            print(package_set)
+
+        same_route_combined_sets = []
+        while len(same_route_set_list) > 0:
+            sets_to_remove = []
+            for index in range(len(same_route_set_list)):
+                if index == 0:
+                    first_set = same_route_set_list[index]
+                    sets_to_remove.append(same_route_set_list[index])
+                else:
+                    if len(first_set.intersection(same_route_set_list[index])) > 0:
+                        sets_to_remove.append(same_route_set_list[index])
+
+            combined_set = set()
+            for index1 in range(len(sets_to_remove)):
+                combined_set = combined_set.union(same_route_set_list[index1])
+            same_route_combined_sets.append(combined_set)
+            for index1 in range(len(sets_to_remove)):
+                same_route_set_list.remove(sets_to_remove[index1])
+
+
+
             # Add package to dictionary
             # if package.address_id not in pkg_dict.keys():
             #     pkg_dict[package.address_id] = [package]
