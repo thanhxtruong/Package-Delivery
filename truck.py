@@ -1,3 +1,6 @@
+import sys
+
+
 class Route:
     def __init__(self, start_vertex, end_vertex, departure, arrival):
         self.start_vertex = start_vertex
@@ -5,11 +8,14 @@ class Route:
         self.departure = departure
         self.arrival = arrival
 
+    def __str__(self):
+        return "Departure: " + str(self.start_vertex.address_id)
+
 
 class Truck:
     def __init__(self, id):
         self.id = id
-        self.route = {}
+        self.routes = {}
         self.total_packages = 0
         self.current_location = None
 
@@ -43,5 +49,12 @@ class Truck:
             return self.id > other.id
         else:
             return NotImplemented
+
+    def add_route(self, route, path):
+        if route not in self.routes.keys():
+            self.routes[route] = path
+        # It is expected that each key(route) is unique
+        else:
+            print("ERROR! DUPLICATE KEY", file=sys.stderr)
 
 

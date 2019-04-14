@@ -3,12 +3,12 @@
 import csv
 import sys
 from inspect import currentframe, getframeinfo
-from datetime import time
+from datetime import datetime, time, timedelta, date
 from queue import PriorityQueue
 from package import Package, Deadline
 from address import Address
 from graph import Vertex, Graph
-from truck import Truck
+from truck import Truck, Route
 
 # Dictionary to hold (address/address_id) pairs
 address_dict = {}
@@ -23,6 +23,9 @@ same_route_combined_sets = []
 # List of all vertices in graph
 vertex_list = []
 graph = Graph()
+
+MAX_PKG_PER_TRUCK = 16
+SPEED = 18
 
 
 def load_graph(filename):
@@ -45,28 +48,33 @@ def load_graph(filename):
             address = Address(address1, city, zip_code, state)
             # Add address to address_dict
             address_dict[address] = index
-            index += 1
 
-            _vertex = Vertex(address)
+            _vertex = Vertex(index)
             vertex_list.append(_vertex)
 
             # Extract distance data from the input string and save into a list
             j = 1
             dist_list = []
             while not float(row[j]) == 0:
-                dist_list.append(row[j])
+                dist_list.append(float(row[j]))
                 j += 1
 
             # Add vertex to graph.
             # Save distances into the adjacency list for the new vertex
-            graph.add_vertex(_vertex, dist_list)
+            graph.add_vertex(_vertex)
 
             # Add undirected edges to graph
-            for _vertex, adj_list in graph.adjacency_list.items():
-                address_list_index = 0
-                for distance in adj_list:
-                    graph.add_undirected_edge(_vertex, vertex_list[address_list_index], distance)
-                    address_list_index += 1
+            address_list_index = 0
+            for travel_distance in dist_list:
+                graph.add_undirected_edge(_vertex, vertex_list[address_list_index], travel_distance)
+                address_list_index += 1
+            # for _vertex, adj_list in graph.adjacency_list.items():
+            #     address_list_index = 0
+            #     for travel_distance in dist_list:
+            #         graph.add_undirected_edge(_vertex, vertex_list[address_list_index], travel_distance)
+            #         address_list_index += 1
+
+            index += 1
 
             # graph.print_graph()
     return graph
@@ -79,6 +87,7 @@ def get_address_from_address_dict(address1, city, zipCode, state):
         address = address_obj
         if address.compare_address(address1, city, zipCode, state):
             return address_id, address_obj
+
 
 # This function return address_id for a given pkg_id in the pkg_dict{}
 def get_address_from_pkg_dict(pkg_id):
@@ -144,11 +153,35 @@ def load_pkg_data(filename):
                 pkg_list = pkg_dict.get(package.address_id)
                 pkg_list.append(package)
 
+            # Add route back to HUB if package has a pickup_time
+            if not (row[7] == ''):
+                # Set address_id to HUB
+                _address_id = 1
+                # Create a new deadline using pickup_time
+                split_time = row[7].split(':')
+                hour = int(split_time[0])
+                # Split string again to remove 'AM'/'PM'
+                minute = int(split_time[1].split(' ')[0])
+                deadline = Deadline(time(hour, minute, 0))
+                # Add deadline to deadline_set
+                deadline_set.add(deadline)
+                # Create a new package obj
+                package = Package(int(row[0]), _address_id, float(row[5]))
+                package.add_delivery_deadline(deadline)
+                # Add package to dictionary
+                if package.address_id not in pkg_dict.keys():
+                    pkg_dict[package.address_id] = [package]
+                else:
+                    pkg_list = pkg_dict.get(package.address_id)
+                    pkg_list.append(package)
+
+
     # Go through list of same_route_sets to combine sets
     combined_set_list = []
     while len(same_route_set_list) > 0:
         sets_to_remove = []
 
+        first_set = None
         for index in range(len(same_route_set_list)):
             if index == 0:
                 first_set = same_route_set_list[index]
@@ -230,19 +263,18 @@ def prioritize_pkg_dict():
         if len(package_list) > 1:
             selection_sort(package_list)
 
-        index = 0
-        for package in package_list:
-            if index == 0:
-                earliest_package = package.deadline
-            index += 1
+        if key == 1:
+            earliest_package = package_list[len(package_list) - 1].deadline
+        else:
+            earliest_package = package_list[0].deadline
 
         for deadline in deadline_set:
             if deadline == earliest_package:
                 priority = deadline.priority
 
-        dest_priority_queue.put((priority, package.address_id))
+        dest_priority_queue.put((priority, key))
 
-    print("Printing destination priority queue", file=sys.stderr)
+    # print("Printing destination priority queue", file=sys.stderr)
     # while not dest_priority_queue.empty():
     #     next_item = dest_priority_queue.get()
     #     print(next_item, file=sys.stderr)
@@ -335,6 +367,34 @@ if __name__ == "__main__":
     dist_filename = "distance_table.csv"
     graph = load_graph(dist_filename)
 
+    # frameinfo = getframeinfo(currentframe())
+    # print(frameinfo.filename, frameinfo.lineno, file=sys.stderr)
+    # print("Printing shortest path for testing...", file=sys.stderr)
+    # start_v = 7
+    # graph.dijkstra_shortest_path(graph.get_vertex(start_v))
+    # for v in graph.adjacency_list:
+    #     print("Vertex %d to %s: %s (total distance: %3.2f)" % (start_v, v.address_id, graph.print_shortest_path(graph.get_vertex(start_v), v), v.distance))
+    #
+    # for vertex in vertex_list:
+    #     vertex.distance = float('inf')
+    #
+    # print(frameinfo.filename, frameinfo.lineno, file=sys.stderr)
+    # print("Printing shortest path for testing...", file=sys.stderr)
+    # start_v = 14
+    # graph.dijkstra_shortest_path(graph.get_vertex(start_v))
+    # for v in graph.adjacency_list:
+    #     print("Vertex %d to %s: %s (total distance: %3.2f)" % (start_v, v.address_id, graph.print_shortest_path(graph.get_vertex(start_v), v), v.distance))
+    #
+    # for vertex in vertex_list:
+    #     vertex.distance = float('inf')
+    #
+    # print(frameinfo.filename, frameinfo.lineno, file=sys.stderr)
+    # print("Printing shortest path for testing...", file=sys.stderr)
+    # start_v = 16
+    # graph.dijkstra_shortest_path(graph.get_vertex(start_v))
+    # for v in graph.adjacency_list:
+    #     print("Vertex %d to %s: %s (total distance: %3.2f)" % (start_v, v.address_id, graph.print_shortest_path(graph.get_vertex(start_v), v), v.distance))
+
     # Create trucks and add to HUB location in graph
     i = 1
     while i < 4:
@@ -355,18 +415,122 @@ if __name__ == "__main__":
     pkg_filename = "package_data.csv"
     load_pkg_data(pkg_filename)
     prioritize_pkg_dict()
+    # Total packages per routes in dest_in_route[]
+    departure = time(8, 0, 0)
+    from_vertex = graph.get_vertex(1)
 
     while not dest_priority_queue.empty():
+        total_packages = 0
         required_truck_id = None
+        required_truck = None
         dest_in_route = []
 
         next_address_id = dest_priority_queue.get()
 
-        while next_address_id not in pkg_dict.keys():
+        while next_address_id[1] not in pkg_dict.keys():
             next_address_id = dest_priority_queue.get()
 
-        dest_in_route.append(next_address_id)
+        dest_in_route.append(next_address_id[1])
 
-        for same_route_set in same_route_set_list:
-            if next_address_id in same_route_set:
-                dest_in_route.append(same_route_set)
+        for same_route_set in same_route_combined_sets:
+            if next_address_id[1] in same_route_set:
+                for item in same_route_set:
+                    if not item == next_address_id[1]:
+                        dest_in_route.append(item)
+                break
+        for address_id in dest_in_route:
+            packages_to_deliver = pkg_dict.get(address_id)
+            if not address_id == 1:
+                total_packages += len(packages_to_deliver)
+            if required_truck_id is None:
+                for package in packages_to_deliver:
+                    if package.truck is not None:
+                        required_truck_id = package.truck
+                        break
+
+        for truck in trucks:
+            if required_truck_id is None:
+                if MAX_PKG_PER_TRUCK - truck.total_packages >= total_packages:
+                    required_truck = truck
+                    break
+            else:
+                if truck.id == required_truck_id:
+                    required_truck = truck
+                    break
+
+        for address_id in dest_in_route:
+            path = []
+            packages_per_route = 0
+
+            # If address_id is not HUB, calculate total_packages for each route
+            # If address_id is HUB, truck is picking up packages; therefore, it does not count
+            packages_to_deliver = pkg_dict.get(address_id)
+            if not address_id == 1:
+                packages_per_route = len(packages_to_deliver)
+            # Get to_vertex from graph using address_id
+            to_vertex = graph.get_vertex(address_id)
+            # Get shortest path and calculate arrival time
+            path = graph.get_shortest_path(from_vertex, to_vertex)
+
+            if len(path) > 2:
+                sub_route_departure = departure
+                # Start with the second address_id and ignore the first and last
+                for index in range(len(path)):
+                    if 0 < index < len(path) - 1:
+                        if path[index] in pkg_dict and not path[index] == 1:
+                            pkg_list = pkg_dict.get(path[index])
+                            sub_route_distance = graph.get_vertex(index).distance
+                            dt = datetime.combine(date.today(), sub_route_departure) + timedelta(minutes=int(sub_route_distance / SPEED * 60))
+                            arrival = dt.time()
+
+                            print("Loading package(s): ", end='')
+                            for package in pkg_list:
+                                print(package.pkg_id, end=' ')
+                            print("to Truck " + str(required_truck.id))
+                            print("\tPackage(s) will be delivered to Destination #" + str(index), end='')
+                            print(" at " + str(arrival))
+                            print('')
+
+                            pkg_dict.pop(path[index])
+                            required_truck.total_packages += len(pkg_list)
+                            departure = arrival
+                            index += 1
+
+            distance = to_vertex.distance
+            dt = datetime.combine(date.today(), departure) + timedelta(minutes=int(distance/SPEED*60))
+            arrival = dt.time()
+            # Create new route and add to required_truck -> routes{}
+            # Update total_packages for required_truck
+            route = Route(from_vertex, to_vertex, departure, arrival)
+            required_truck.add_route(route, path)
+            required_truck.total_packages += packages_per_route
+
+            print("Loading package(s): ", end='')
+            for package in packages_to_deliver:
+                print(package.pkg_id, end=' ')
+            print("to Truck " + str(required_truck.id))
+            print("\tPackage(s) will be delivered to Destination #" + str(address_id), end='')
+            print(" at " + str(arrival))
+            print('')
+
+            # Update departure, start location for next route, truck's location,
+            # and remove delivered destination from pkg_dict
+            departure = arrival
+            from_vertex = to_vertex
+            required_truck.current_location = to_vertex
+            pkg_dict.pop(address_id)
+            # Clear shortest path calculation
+            for vertex in vertex_list:
+                vertex.distance = float('inf')
+
+    print("==============================================================================")
+    for truck in trucks:
+        print("Routes for Truck %d: " % truck.id, end='')
+        for route in truck.routes.keys():
+            print(route)
+            print(truck.routes.get(route))
+
+
+
+
+

@@ -1,7 +1,7 @@
 # Deadline class used to assign Priority based on deadline
 class Deadline:
     def __init__(self, time):
-        self.deadline = time
+        self.time = time
         self.priority = None
 
     # def __str__(self):
@@ -9,7 +9,7 @@ class Deadline:
 
     def __eq__(self, other):
         if isinstance(other, Deadline):
-            return self.deadline == other.deadline
+            return self.time == other.time
         else:
             return NotImplemented
 
@@ -23,19 +23,19 @@ class Deadline:
     # Override less than comparison to compare based on delivery deadline
     def __lt__(self, other):
         if isinstance(other, Deadline):
-            return self.deadline < other.deadline
+            return self.time < other.time
         else:
             return NotImplemented
 
     # Override greater than comparison to compare based on delivery deadline
     def __gt__(self, other):
         if isinstance(other, Deadline):
-            return self.deadline > other.deadline
+            return self.time > other.time
         else:
             return NotImplemented
 
     def __hash__(self):
-        return hash(self.deadline)
+        return hash(self.time)
 
     def set_priority(self, priority):
         self.priority = priority
