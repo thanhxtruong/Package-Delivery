@@ -1,4 +1,5 @@
 import sys
+from datetime import  time
 
 
 class Route:
@@ -18,6 +19,7 @@ class Truck:
         self.routes = {}
         self.total_packages = 0
         self.current_location = None
+        self.departure = time(8, 0, 0)
 
     def __str__(self):
         return self.id

@@ -1,44 +1,44 @@
 "Package
 ID",Address,City ,Zip,State,"Mass
 KILO","Delivery
-Deadline",Pickup,Truck #,Combined Packages
-6,3060 Lester St,West Valley City,84119,UT,88,10:30 AM,9:05 AM,,
-14,4300 S 1300 E,Millcreek,84117,UT,88,10:30 AM,,,"15,19"
-16,4580 S 2300 E,Holladay,84117,UT,88,10:30 AM,,,"13,19"
-20,3595 Main St,Salt Lake City,84115,UT,37,10:30 AM,,,"13,15"
-1,195 W Oakland Ave,Salt Lake City,84115,UT,21,10:30 AM,,,"2,3"
-2,2530 S 500 E,Salt Lake City,84106,UT,44,EOD,,,3
-3,233 Canyon Rd,Salt Lake City,84103,UT,2,EOD,,2,
-4,380 W 2880 S,Salt Lake City,84115,UT,4,EOD,,,
-5,410 S State St,Salt Lake City,84111,UT,5,EOD,,,
-7,1330 2100 S,Salt Lake City,84106,UT,8,EOD,,,
-8,300 State St,Salt Lake City,84103,UT,9,EOD,,,
-9,300 State St,Salt Lake City,84103,UT,2,EOD,,,
-10,600 E 900 South,Salt Lake City,84105,UT,1,EOD,,,
-11,2600 Taylorsville Blvd,Salt Lake City,84118,UT,1,EOD,,,
-12,3575 W Valley Central Station bus Loop,West Valley City,84119,UT,1,EOD,,,
-13,2010 W 500 S,Salt Lake City,84104,UT,2,10:30 AM,,,
-15,4580 S 2300 E,Holladay,84117,UT,4,9:00 AM,,2,
-17,3148 S 1100 W,Salt Lake City,84119,UT,2,EOD,,,
-18,1488 4800 S,Salt Lake City,84123,UT,6,EOD,,2,
-19,177 W Price Ave,Salt Lake City,84115,UT,37,EOD,,,
-21,3595 Main St,Salt Lake City,84115,UT,3,EOD,,,
-22,6351 South 900 East,Murray,84121,UT,2,EOD,,,
-23,5100 South 2700 West,Salt Lake City,84118,UT,5,EOD,,,
-24,5025 State St,Murray,84107,UT,7,EOD,,,
-25,5383 South 900 East #104,Salt Lake City,84117,UT,7,10:30 AM,9:05 AM,,
-26,5383 South 900 East #104,Salt Lake City,84117,UT,25,EOD,,,
-27,1060 Dalton Ave S,Salt Lake City,84104,UT,5,EOD,,,
-28,2835 Main St,Salt Lake City,84115,UT,7,EOD,9:05 AM,,
-29,1330 2100 S,Salt Lake City,84106,UT,2,10:30 AM,,,
-30,300 State St,Salt Lake City,84103,UT,1,10:30 AM,,,
-31,3365 S 900 W,Salt Lake City,84119,UT,1,10:30 AM,,,
-32,3365 S 900 W,Salt Lake City,84119,UT,1,EOD,9:05 AM,,
-33,2530 S 500 E,Salt Lake City,84106,UT,1,EOD,,,
-34,4580 S 2300 E,Holladay,84117,UT,2,10:30 AM,,,
-35,1060 Dalton Ave S,Salt Lake City,84104,UT,88,EOD,,,
-36,2300 Parkway Blvd,West Valley City,84119,UT,88,EOD,,2,
-37,410 S State St,Salt Lake City,84111,UT,2,10:30 AM,,,
-38,410 S State St,Salt Lake City,84111,UT,9,EOD,,2,
-39,2010 W 500 S,Salt Lake City,84104,UT,9,EOD,,,
-40,380 W 2880 S,Salt Lake City,84115,UT,45,10:30 AM,,,
+Deadline",Pickup,Truck #,Combined Packages,,,
+1,195 W Oakland Ave,Salt Lake City,84115,UT,21,10:30 AM,,,,,,9
+2,2530 S 500 E,Salt Lake City,84106,UT,44,EOD,,,,,,
+3,233 Canyon Rd,Salt Lake City,84103,UT,2,EOD,,2,,,,
+4,380 W 2880 S,Salt Lake City,84115,UT,4,EOD,,,,,,
+5,410 S State St,Salt Lake City,84111,UT,5,EOD,,,,,,
+6,3060 Lester St,West Valley City,84119,UT,88,10:30 AM,9:05 AM,,,,,
+7,1330 2100 S,Salt Lake City,84106,UT,8,EOD,,,,,,8
+8,300 State St,Salt Lake City,84103,UT,9,EOD,,,,,,
+9,300 State St,Salt Lake City,84103,UT,2,EOD,,,,,,
+10,600 E 900 South,Salt Lake City,84105,UT,1,EOD,,,,,,
+11,2600 Taylorsville Blvd,Salt Lake City,84118,UT,1,EOD,,,,,,
+12,3575 W Valley Central Station bus Loop,West Valley City,84119,UT,1,EOD,,,,,,
+13,2010 W 500 S,Salt Lake City,84104,UT,2,10:30 AM,,,,,,3
+14,4300 S 1300 E,Millcreek,84117,UT,88,10:30 AM,,,"15,19",,,6
+15,4580 S 2300 E,Holladay,84117,UT,4,9:00 AM,,2,,,,1
+16,4580 S 2300 E,Holladay,84117,UT,88,10:30 AM,,,"13,19",,,1
+17,3148 S 1100 W,Salt Lake City,84119,UT,2,EOD,,,,,,
+18,1488 4800 S,Salt Lake City,84123,UT,6,EOD,,2,,,,
+19,177 W Price Ave,Salt Lake City,84115,UT,37,EOD,,,,,,2
+20,3595 Main St,Salt Lake City,84115,UT,37,10:30 AM,,,"13,15",,,5
+21,3595 Main St,Salt Lake City,84115,UT,3,EOD,,,,,,5
+22,6351 South 900 East,Murray,84121,UT,2,EOD,,,,,,
+23,5100 South 2700 West,Salt Lake City,84118,UT,5,EOD,,,,,,
+24,5025 State St,Murray,84107,UT,7,EOD,,,,,,
+25,5383 South 900 East #104,Salt Lake City,84117,UT,7,10:30 AM,9:05 AM,,,,,
+26,5383 South 900 East #104,Salt Lake City,84117,UT,25,EOD,,,,,,
+27,1060 Dalton Ave S,Salt Lake City,84104,UT,5,EOD,,,,,,
+28,2835 Main St,Salt Lake City,84115,UT,7,EOD,9:05 AM,,,,,
+29,1330 2100 S,Salt Lake City,84106,UT,2,10:30 AM,,,,,,8
+30,300 State St,Salt Lake City,84103,UT,1,10:30 AM,,,,,,
+31,3365 S 900 W,Salt Lake City,84119,UT,1,10:30 AM,,,,,,4
+32,3365 S 900 W,Salt Lake City,84119,UT,1,EOD,9:05 AM,,,,,
+33,2530 S 500 E,Salt Lake City,84106,UT,1,EOD,,,,,,
+34,4580 S 2300 E,Holladay,84117,UT,2,10:30 AM,,,,,,
+35,1060 Dalton Ave S,Salt Lake City,84104,UT,88,EOD,,,,,,1
+36,2300 Parkway Blvd,West Valley City,84119,UT,88,EOD,,2,,,,
+37,410 S State St,Salt Lake City,84111,UT,2,10:30 AM,,,,,,
+38,410 S State St,Salt Lake City,84111,UT,9,EOD,,2,,,,
+39,2010 W 500 S,Salt Lake City,84104,UT,9,EOD,,,,,,3
+40,380 W 2880 S,Salt Lake City,84115,UT,45,10:30 AM,,,,,,

@@ -23,6 +23,8 @@ same_route_combined_sets = []
 # List of all vertices in graph
 vertex_list = []
 graph = Graph()
+# Dictionary of packages that require pick-up later
+pickup_packages = {}
 
 MAX_PKG_PER_TRUCK = 16
 SPEED = 18
@@ -110,10 +112,10 @@ def load_pkg_data(filename):
 
             # Get address_id from address_dict{}
             address_tuple = get_address_from_address_dict(row[1], row[2], row[3], row[4])
-            _address_id = address_tuple[0]
+            hub_address_id = address_tuple[0]
 
             # Create package obj
-            package = Package(int(row[0]), _address_id, float(row[5]))
+            package = Package(int(row[0]), hub_address_id, float(row[5]))
 
             # Set delivery deadline
             # Deadline is hardcoded to 23:00:00 if set to 'EOD'
@@ -146,17 +148,10 @@ def load_pkg_data(filename):
 
                 same_route_set_list.append(temp_set)
 
-            # Add package to dictionary
-            if package.address_id not in pkg_dict.keys():
-                pkg_dict[package.address_id] = [package]
-            else:
-                pkg_list = pkg_dict.get(package.address_id)
-                pkg_list.append(package)
-
             # Add route back to HUB if package has a pickup_time
             if not (row[7] == ''):
                 # Set address_id to HUB
-                _address_id = 1
+                hub_address_id = 1
                 # Create a new deadline using pickup_time
                 split_time = row[7].split(':')
                 hour = int(split_time[0])
@@ -166,15 +161,29 @@ def load_pkg_data(filename):
                 # Add deadline to deadline_set
                 deadline_set.add(deadline)
                 # Create a new package obj
-                package = Package(int(row[0]), _address_id, float(row[5]))
-                package.add_delivery_deadline(deadline)
+                pickup_package = Package(int(row[0]), hub_address_id, float(row[5]))
+                pickup_package.add_delivery_deadline(deadline)
+                # Add pickup_package to dictionary
+                if pickup_package.address_id not in pkg_dict.keys():
+                    pkg_dict[pickup_package.address_id] = [pickup_package]
+                else:
+                    pkg_list1 = pkg_dict.get(pickup_package.address_id)
+                    pkg_list1.append(pickup_package)
+
+                # Add delivery package to pickup_packages{}
+                if package.address_id not in pickup_packages.keys():
+                    pickup_packages[package.address_id] = [package]
+                else:
+                    pkg_list2 = pickup_packages.get(package.address_id)
+                    pkg_list2.append(package)
+
+            else:
                 # Add package to dictionary
                 if package.address_id not in pkg_dict.keys():
                     pkg_dict[package.address_id] = [package]
                 else:
-                    pkg_list = pkg_dict.get(package.address_id)
-                    pkg_list.append(package)
-
+                    pkg_list3 = pkg_dict.get(package.address_id)
+                    pkg_list3.append(package)
 
     # Go through list of same_route_sets to combine sets
     combined_set_list = []
@@ -358,6 +367,27 @@ def selection_sort(numbers):
     return comparisons
 
 
+# This function prints loading of packages onto Truck
+def print_pkg_loading(package_list, required_truck, address_id, arrival):
+    print("Loading package(s): ", end='')
+    for pkg in package_list:
+        print(pkg.pkg_id, end=' ')
+    print("to Truck " + str(required_truck.id))
+    print("\tPackage(s) will be delivered to Destination #" + str(address_id), end='')
+    print(" at " + str(arrival))
+    print('')
+
+
+# This function prints packages picked up at HUB
+def print_pkg_pickup(package_list, required_truck, arrival):
+    print("Picking package(s) at HUB. Package(s) #: ", end='')
+    for pkg in package_list:
+        print(pkg.pkg_id, end=' ')
+    print("loaded to Truck " + str(required_truck.id))
+    print("\tPackage(s) will be picked up to at " + str(arrival))
+    print('')
+
+
 if __name__ == "__main__":
     # TODO: Modify sorted() using attrgetter (dijkstra)
     trucks = []
@@ -416,8 +446,9 @@ if __name__ == "__main__":
     load_pkg_data(pkg_filename)
     prioritize_pkg_dict()
     # Total packages per routes in dest_in_route[]
-    departure = time(8, 0, 0)
     from_vertex = graph.get_vertex(1)
+    finished = False
+    previous_truck = None
 
     while not dest_priority_queue.empty():
         total_packages = 0
@@ -428,100 +459,149 @@ if __name__ == "__main__":
         next_address_id = dest_priority_queue.get()
 
         while next_address_id[1] not in pkg_dict.keys():
-            next_address_id = dest_priority_queue.get()
-
-        dest_in_route.append(next_address_id[1])
-
-        for same_route_set in same_route_combined_sets:
-            if next_address_id[1] in same_route_set:
-                for item in same_route_set:
-                    if not item == next_address_id[1]:
-                        dest_in_route.append(item)
+            if not dest_priority_queue.empty():
+                next_address_id = dest_priority_queue.get()
+            else:
+                finished = True
                 break
-        for address_id in dest_in_route:
-            packages_to_deliver = pkg_dict.get(address_id)
-            if not address_id == 1:
-                total_packages += len(packages_to_deliver)
-            if required_truck_id is None:
-                for package in packages_to_deliver:
-                    if package.truck is not None:
-                        required_truck_id = package.truck
+
+        if not finished:
+
+            if next_address_id[1] == 1:
+                pickup_package_list = pkg_dict.get(next_address_id[1])
+                latest_pickup_time = pickup_package_list[len(pickup_package_list) - 1].deadline.time
+                # Find truck with latest departure time
+                # Set requires_truck_id to truck with latest departure time
+                latest_departure = trucks[0].departure
+                for truck_index in range(len(trucks)):
+                    if trucks[truck_index].departure > latest_departure:
+                        latest_departure = trucks[truck_index].departure
+                        required_truck_id = trucks[truck_index].id
+
+                # If packages are not available for pickup yet, hold the address_id,
+                # pop next address_id, and insert the hold address_id back into the queue.
+                # Reset required_truck_id to None
+                if latest_departure < latest_pickup_time:
+                    hold_address_tuple = next_address_id
+                    next_address_id = dest_priority_queue.get()
+                    dest_priority_queue.put((hold_address_tuple[0], hold_address_tuple[1]))
+                    required_truck_id = None
+
+            dest_in_route.append(next_address_id[1])
+
+            for same_route_set in same_route_combined_sets:
+                if next_address_id[1] in same_route_set:
+                    for item in same_route_set:
+                        if not item == next_address_id[1]:
+                            dest_in_route.append(item)
+                    break
+            for address_id in dest_in_route:
+                packages_to_deliver = pkg_dict.get(address_id)
+                if not address_id == 1:
+                    total_packages += len(packages_to_deliver)
+                if required_truck_id is None:
+                    for package in packages_to_deliver:
+                        if package.truck is not None:
+                            required_truck_id = package.truck
+                            break
+
+            for truck in trucks:
+                candidate_trucks = []
+                if required_truck_id is None:
+                    if previous_truck is None:
+                        if MAX_PKG_PER_TRUCK - truck.total_packages >= total_packages:
+                            required_truck = truck
+                            break
+                    else:
+                        if MAX_PKG_PER_TRUCK - truck.total_packages >= total_packages and not truck.id == previous_truck :
+                            required_truck = truck
+                            break
+                else:
+                    if truck.id == required_truck_id:
+                        required_truck = truck
+                        previous_truck = required_truck.id
                         break
 
-        for truck in trucks:
-            if required_truck_id is None:
-                if MAX_PKG_PER_TRUCK - truck.total_packages >= total_packages:
-                    required_truck = truck
-                    break
-            else:
-                if truck.id == required_truck_id:
-                    required_truck = truck
-                    break
+            for address_id in dest_in_route:
+                path = []
+                packages_per_route = 0
 
-        for address_id in dest_in_route:
-            path = []
-            packages_per_route = 0
+                # If address_id is not HUB, calculate total_packages for each route
+                # If address_id is HUB, truck is picking up packages; therefore, it does not count
+                packages_to_deliver = pkg_dict.get(address_id)
+                if not address_id == 1:
+                    packages_per_route = len(packages_to_deliver)
+                # Get to_vertex from graph using address_id
+                to_vertex = graph.get_vertex(address_id)
+                # Get shortest path and calculate arrival time
+                path = graph.get_shortest_path(required_truck.current_location, to_vertex)
 
-            # If address_id is not HUB, calculate total_packages for each route
-            # If address_id is HUB, truck is picking up packages; therefore, it does not count
-            packages_to_deliver = pkg_dict.get(address_id)
-            if not address_id == 1:
-                packages_per_route = len(packages_to_deliver)
-            # Get to_vertex from graph using address_id
-            to_vertex = graph.get_vertex(address_id)
-            # Get shortest path and calculate arrival time
-            path = graph.get_shortest_path(from_vertex, to_vertex)
+                if len(path) > 2:
+                    sub_route_departure = required_truck.departure
+                    # Start with the second address_id and ignore the first and last
+                    for index in range(len(path)):
+                        if 0 < index < len(path) - 1:
+                            if path[index] in pkg_dict and not path[index] == 1:
+                                pkg_list = pkg_dict.get(path[index])
+                                sub_route_distance = graph.get_vertex(index).distance
+                                dt = datetime.combine(date.today(), sub_route_departure) + timedelta(minutes=int(sub_route_distance / SPEED * 60))
+                                arrival = dt.time()
 
-            if len(path) > 2:
-                sub_route_departure = departure
-                # Start with the second address_id and ignore the first and last
-                for index in range(len(path)):
-                    if 0 < index < len(path) - 1:
-                        if path[index] in pkg_dict and not path[index] == 1:
-                            pkg_list = pkg_dict.get(path[index])
-                            sub_route_distance = graph.get_vertex(index).distance
-                            dt = datetime.combine(date.today(), sub_route_departure) + timedelta(minutes=int(sub_route_distance / SPEED * 60))
-                            arrival = dt.time()
+                                print_pkg_loading(pkg_list, required_truck, index, arrival)
 
-                            print("Loading package(s): ", end='')
-                            for package in pkg_list:
-                                print(package.pkg_id, end=' ')
-                            print("to Truck " + str(required_truck.id))
-                            print("\tPackage(s) will be delivered to Destination #" + str(index), end='')
-                            print(" at " + str(arrival))
-                            print('')
+                                pkg_dict.pop(path[index])
+                                required_truck.total_packages += len(pkg_list)
+                                required_truck.departure = arrival
+                                index += 1
 
-                            pkg_dict.pop(path[index])
-                            required_truck.total_packages += len(pkg_list)
-                            departure = arrival
-                            index += 1
+                distance = to_vertex.distance
+                dt = datetime.combine(date.today(), required_truck.departure) + timedelta(minutes=int(distance/SPEED*60))
+                arrival = dt.time()
+                # Create new route and add to required_truck -> routes{}
+                # Update total_packages for required_truck
+                route = Route(from_vertex, to_vertex, required_truck.departure, arrival)
+                required_truck.add_route(route, path)
+                required_truck.total_packages += packages_per_route
 
-            distance = to_vertex.distance
-            dt = datetime.combine(date.today(), departure) + timedelta(minutes=int(distance/SPEED*60))
-            arrival = dt.time()
-            # Create new route and add to required_truck -> routes{}
-            # Update total_packages for required_truck
-            route = Route(from_vertex, to_vertex, departure, arrival)
-            required_truck.add_route(route, path)
-            required_truck.total_packages += packages_per_route
+                if address_id == 1:
+                    print_pkg_pickup(packages_to_deliver, required_truck, arrival)
+                    # Load hold packages from pickup_packages{} loaded earlier into pkg_dict
+                    # Array holding address_id to be later removed from pickup_packages{}
+                    address_to_remove = []
+                    for hold_address in pickup_packages.keys():
+                        hold_packages = pickup_packages.get(hold_address)
+                        for hold_pkg in hold_packages:
+                            for item in packages_to_deliver:
+                                if hold_pkg.pkg_id == item.pkg_id:
+                                    pkgs_to_transfer = pickup_packages.get(hold_address)
+                                    # Set required_truck for each package to the truck
+                                    # selected for pick-up earlier
+                                    for package in pkgs_to_transfer:
+                                        package.truck = required_truck_id
+                                    # Transfer hold packages to pkg_dict{}
+                                    if hold_address not in pkg_dict.keys():
+                                        pkg_dict[hold_address] = pkgs_to_transfer
+                                    else:
+                                        pkg_list = pkg_dict.get(hold_address)
+                                        for package in pkgs_to_transfer:
+                                            pkg_list.append(package)
+                                    address_to_remove.append(hold_address)
+                                    break
+                    for address in address_to_remove:
+                        pickup_packages.pop(address)
+                    prioritize_pkg_dict()
+                else:
+                    print_pkg_loading(packages_to_deliver, required_truck, address_id, arrival)
 
-            print("Loading package(s): ", end='')
-            for package in packages_to_deliver:
-                print(package.pkg_id, end=' ')
-            print("to Truck " + str(required_truck.id))
-            print("\tPackage(s) will be delivered to Destination #" + str(address_id), end='')
-            print(" at " + str(arrival))
-            print('')
-
-            # Update departure, start location for next route, truck's location,
-            # and remove delivered destination from pkg_dict
-            departure = arrival
-            from_vertex = to_vertex
-            required_truck.current_location = to_vertex
-            pkg_dict.pop(address_id)
-            # Clear shortest path calculation
-            for vertex in vertex_list:
-                vertex.distance = float('inf')
+                # Update departure, start location for next route, truck's location,
+                # and remove delivered destination from pkg_dict
+                required_truck.departure = arrival
+                from_vertex = to_vertex
+                required_truck.current_location = to_vertex
+                pkg_dict.pop(address_id)
+                # Clear shortest path calculation
+                for vertex in vertex_list:
+                    vertex.distance = float('inf')
 
     print("==============================================================================")
     for truck in trucks:
