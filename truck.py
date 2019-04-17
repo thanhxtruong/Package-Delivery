@@ -1,6 +1,6 @@
 import sys
-from datetime import  time
 
+MAX_PKG_PER_TRUCK = 16
 
 class Route:
     def __init__(self, start_vertex, end_vertex, departure, arrival):
@@ -19,7 +19,10 @@ class Truck:
         self.routes = {}
         self.total_packages = 0
         self.current_location = None
-        self.departure = time(8, 0, 0)
+        self.departure = None
+        self.has_driver = False
+        self.reserved_pkg = []
+        self.max_capacity = MAX_PKG_PER_TRUCK
 
     def __str__(self):
         return self.id
@@ -58,5 +61,6 @@ class Truck:
         # It is expected that each key(route) is unique
         else:
             print("ERROR! DUPLICATE KEY", file=sys.stderr)
+
 
 
