@@ -557,7 +557,7 @@ if __name__ == "__main__":
 
                 available_trucks = []
                 for truck in trucks:
-                    if truck.has_driver and total_packages <= truck.max_capacity - truck.total_packages:
+                    if truck.has_driver and total_packages <= MAX_PKG_PER_TRUCK - truck.total_packages:
                         available_trucks.append(truck)
                 if len(available_trucks) > 0:
                     min_pkg_truck = available_trucks[0]
@@ -607,7 +607,7 @@ if __name__ == "__main__":
                         if 0 < index < len(path) - 1:
                             if path[index] in pkg_dict and not path[index] == 1:
                                 pkg_list = pkg_dict.get(path[index])
-                                if len(pkg_list) <= truck.max_capacity - truck.total_packages:
+                                if len(pkg_list) <= MAX_PKG_PER_TRUCK - truck.total_packages:
                                     sub_route_distance = graph.get_vertex(index).distance
                                     dt = datetime.combine(date.today(), sub_route_departure) + timedelta(minutes=int(sub_route_distance / SPEED * 60))
                                     arrival = dt.time()
@@ -670,6 +670,7 @@ if __name__ == "__main__":
                 # Check if truck has delivered its final package and send it back to HUB
                 # to pick up more packages
                 if required_truck.total_packages == MAX_PKG_PER_TRUCK and len(required_truck.reserved_pkg) < 1:
+
                     hub_vertex = graph.get_vertex(1)
                     path = graph.get_shortest_path(required_truck.current_location, hub_vertex)
                     distance = hub_vertex.distance
@@ -680,26 +681,47 @@ if __name__ == "__main__":
                     # Update total_packages for required_truck
                     route = Route(from_vertex, hub_vertex, required_truck.departure, arrival)
                     required_truck.add_route(route, path)
+                    print('*************************************************************')
                     print("Sending Truck %d back to HUB. Truck will arrive at HUB at %s" % (required_truck.id, arrival))
+
 
                     # Update departure, start location for next route, truck's location,
                     # and remove delivered destination from pkg_dict
                     required_truck.departure = arrival
                     from_vertex = hub_vertex
                     required_truck.current_location = hub_vertex
+                    required_truck.completed_all_routes = True
 
                     for truck in trucks:
-                        if not truck.has_driver and truck.departure is None:
+                        if truck.departure is None:
                             truck.departure = required_truck.departure
                             print("Driver from Truck %d will be delivering packages from Truck %d" % (required_truck.id, truck.id))
-                            print('')
+                    print('')
+                    print('*************************************************************')
+
+                    # If all trucks with driver have delivered all packages, switch
+                    # back-up truck -> has_driver to True
+                    for truck in trucks:
+                        if truck.has_driver:
+                            if truck.completed_all_routes:
+                                mission_completed = True
+                            else:
+                                mission_completed = False
+                                break
+                    if mission_completed:
+                        for truck in trucks:
+                            if not truck.has_driver:
+                                truck.has_driver = True
 
     print("==============================================================================")
     for truck in trucks:
         print("Routes for Truck %d: " % truck.id)
+        print('')
         for route in truck.routes.keys():
             print(route)
+            print("Routes: ", end='')
             print(truck.routes.get(route))
+            print('')
         print("Total packages delivered: " + str(truck.total_packages))
         print("==========================================================================")
 

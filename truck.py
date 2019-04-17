@@ -1,6 +1,5 @@
 import sys
 
-MAX_PKG_PER_TRUCK = 16
 
 class Route:
     def __init__(self, start_vertex, end_vertex, departure, arrival):
@@ -22,7 +21,7 @@ class Truck:
         self.departure = None
         self.has_driver = False
         self.reserved_pkg = []
-        self.max_capacity = MAX_PKG_PER_TRUCK
+        self.completed_all_routes = False
 
     def __str__(self):
         return self.id
