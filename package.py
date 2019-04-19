@@ -51,8 +51,16 @@ class Package:
 
         # Initialize deadline, required truck, and combined_pkg to None
         self.deadline = None
+        self.pickup_time = None
+        self.delivered_time = None
         self.truck = None
         self.combined_pkg = []
+        self.status = self.add_status(0)
+
+    def add_status(self, status_id):
+        options = ('Awaiting Pickup at HUB', 'In Route', 'Delivered')
+        status = list(enumerate(options))
+        return status[status_id][1]
 
     # Override method to print package by ID and deadline
     def __str__(self):
@@ -62,7 +70,7 @@ class Package:
     # Override equality comparison to compare based on delivery deadline
     def __eq__(self, other):
         if isinstance(other, Package):
-            return self.deadline == other.deadline
+            return self.pkg_id == other.pkg_id and self.deadline == other.deadline and self.weight == other.weight and self.status == other.status
         else:
             return NotImplemented
 
@@ -92,6 +100,9 @@ class Package:
 
     def __iter__(self):
         return self.pkg_id
+
+    def __hash__(self):
+        return hash((self.pkg_id, self.address_id, self.deadline, self.weight, self.status))
 
     # Set delivery deadline
     def add_delivery_deadline(self, deadline):

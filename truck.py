@@ -18,7 +18,10 @@ class Truck:
         self.routes = {}
         self.total_packages = 0
         self.current_location = None
+        # Departure time is recalculated for each route
         self.departure = None
+        # Pickup_time is the fixed time of when truck start its day
+        self.pickup_time = None
         self.has_driver = False
         self.reserved_pkg = []
         self.completed_all_routes = False
