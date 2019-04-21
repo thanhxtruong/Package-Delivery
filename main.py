@@ -190,7 +190,7 @@ def load_pkg_data(filename):
             city = row[2]
             zip_code = row[3]
             state = row[4]
-            weight = row[5]
+            weight = float(row[5])
 
             if row[6] == 'EOD':
                 deadline = Deadline(time(23, 0, 0))
@@ -273,7 +273,6 @@ def prioritize_pkg_dict():
         deadline.priority = priority
         priority += 1
 
-    # TODO: Change to sorted() method
     # Iterate through pkg_dict (address_id/[packages]).
     # For each list of packages, sort the list to find the earliest deadline.
     # Assign priority
@@ -304,82 +303,6 @@ def create_hash_table():
             pkg_hash_table.insert(package)
 
 
-# Merge sort algorithm
-def merge(numbers, i, j, k):
-    merged_size = k - i + 1  # Size of merged partition
-    merged_numbers = [0] * merged_size  # Dynamically allocates temporary array
-    # for merged numbers
-    merge_pos = 0  # Position to insert merged number
-    left_pos = i  # Initialize left partition position
-    right_pos = j + 1  # Initialize right partition position
-
-    # Add smallest element from left or right partition to merged numbers
-    while left_pos <= j and right_pos <= k:
-        if numbers[left_pos] < numbers[right_pos] or numbers[left_pos] == numbers[right_pos]:
-            merged_numbers[merge_pos] = numbers[left_pos]
-            left_pos += 1
-        else:
-            merged_numbers[merge_pos] = numbers[right_pos]
-            right_pos += 1
-        merge_pos = merge_pos + 1
-
-    # If left partition is not empty, add remaining elements to merged numbers
-    while left_pos <= j:
-        merged_numbers[merge_pos] = numbers[left_pos]
-        left_pos += 1
-        merge_pos += 1
-
-    # If right partition is not empty, add remaining elements to merged numbers
-    while right_pos <= k:
-        merged_numbers[merge_pos] = numbers[right_pos]
-        right_pos = right_pos + 1
-        merge_pos = merge_pos + 1
-
-    # Copy merge number back to numbers
-    for merge_pos in range(merged_size):
-        numbers[i + merge_pos] = merged_numbers[merge_pos]
-
-
-# Merge sort
-# numbers: list
-# i: first index
-# k: last index
-def merge_sort(numbers, i, k):
-    j = 0
-
-    if i < k:
-        j = (i + k) // 2  # Find the midpoint in the partition
-
-        # Recursively sort left and right partitions
-        merge_sort(numbers, i, j)
-        merge_sort(numbers, j + 1, k)
-
-        # Merge left and right partition in sorted order
-        merge(numbers, i, j, k)
-
-
-def selection_sort(numbers):
-    # A variable to hold the number of item comparisons
-    comparisons = 0
-
-    for i in range(len(numbers) - 1):
-
-        # Find index of smallest remaining element
-        index_smallest = i
-        for j in range(i + 1, len(numbers)):
-
-            comparisons = comparisons + 1
-            if numbers[j] < numbers[index_smallest]:
-                index_smallest = j
-
-        # Swap numbers[i] and numbers[index_smallest]
-        temp = numbers[i]
-        numbers[i] = numbers[index_smallest]
-        numbers[index_smallest] = temp
-
-    return comparisons
-
-
 # This function prints loading of packages onto Truck
 def print_pkg_loading(package_list, required_truck, address_id, arrival):
     print("Loading package(s): ", end='')
@@ -403,6 +326,7 @@ def print_pkg_pickup(package_list, required_truck, arrival):
     print("loaded to Truck " + str(required_truck.id))
     print("\tPackage(s) will be picked up to at " + str(arrival))
     print('')
+
 
 def get_user_input():
     prompts = ["Enter a package ID: ", "Enter delivery address: ", "Enter delivery city: ", "Enter delivery zip code: ", "Enter delivery state: ", "Enter delivery deadline: ", "Enter package weight: "]
@@ -1191,31 +1115,49 @@ if __name__ == "__main__":
                         else:
                             pkg_dict[item.address] = [item]
 
-            pkg_to_add = get_user_input()
+            pkg_to_update = get_user_input()
 
-            if pkg_to_add not in pkg_dict:
-                print('')
-                print("Package has been delivered")
-                print('')
-            else:
-                print("Choose an option below to modify delivery requirements")
-                print("Menu:")
-                print("\t1. Change delivery address")
-                print("\t2. Check delivery deadline")
-                print("\t3. Change package weight")
-                print("\t4. Go back")
+            if pkg_hash_table.search(pkg_to_update) is not None:
+                pkg_to_update = pkg_hash_table.search(pkg_to_update)
+                if pkg_to_update.status == 'Delivered':
+                    print('')
+                    print("Package has been delivered")
+                    print('')
+                else:
+                    print("Choose an option below to modify delivery requirements")
+                    print("Menu:")
+                    print("\t1. Change delivery address")
+                    print("\t2. Check delivery deadline")
+                    print("\t3. Change package weight")
+                    print("\t4. Go back")
 
-                user_selection = 1
-                while not user_selection == 4:
-                    user_selection = input("Select a number from 1-4 from the menu above: ")
-                    if user_selection == 1:
-                        new_street = input("Enter a street address: ")
-                        new_city = input("Enter a new city: ")
-                        new_zipCode = input("Enter a new zip code: ")
-                        new_state = input("Enter a new state: ")
+                    user_selection = 1
+                    while not user_selection == 4:
+                        user_selection = input("Select a number from 1-4 from the menu above: ")
+                        if int(user_selection) == 1:
+                            new_street = input("Enter a street address: ")
+                            new_city = input("Enter a new city: ")
+                            new_zipCode = input("Enter a new zip code: ")
+                            new_state = input("Enter a new state: ")
 
-                        new_address = Address(new_street, new_city, new_zipCode, new_state)
-                        pkg_to_add.address = new_address
+                            new_address = Address(new_street, new_city, new_zipCode, new_state)
+                            # Get address from address_dict{}
+                            new_address = list(address_dict.keys())[address_dict.get(new_address)-1]
+                            # Remove pkg from pkg_dict and pkg_hash_table
+                            # Add new package back into pkg_dict and pkg_hash_table
+                            # Re-prioritize
+                            # Re-calculate route
+                            pkg_hash_table.remove(pkg_to_update)
+                            for package in pkg_dict.get(pkg_to_update.address):
+                                if package == pkg_to_update:
+                                    pkg_dict.get(pkg_to_update.address).remove(pkg_to_update)
+
+                            pkg_to_update.address = new_address
+                            pkg_dict.setdefault(new_address, []).append(pkg_to_update)
+                            pkg_hash_table.insert(pkg_to_update)
+                            prioritize_pkg_dict()
+
+
 
 
 
