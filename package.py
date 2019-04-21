@@ -52,6 +52,7 @@ class Package:
 
         # Initialize deadline, required truck, and combined_pkg to None
         self.deadline = None
+        self.later_pickup_time = None
         self.pickup_time = None
         self.delivered_time = None
         self.truck = None
