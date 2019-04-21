@@ -6,7 +6,7 @@ class Address:
         self.state = state
 
     def __str__(self):
-        return self.address1
+        return str(self.address1 + '\n' + self.city + ', ' + self.state + ' ' + self.zipCode)
 
     # Override equality comparison to compare based on delivery deadline
     def __eq__(self, other):
@@ -24,18 +24,18 @@ class Address:
     def __hash__(self):
         return hash((self.address1, self.city, self.zipCode, self.state))
 
-    # def __lt__(self, other):
-    #     if isinstance(other, Address):
-    #         return self.address1 < other.address1 and self.city < other.city and self.zipCode < other.zipCode and self.state < other.state
-    #     else:
-    #         return NotImplemented
-    #
-    # # Override greater than comparison to compare based on delivery deadline
-    # def __gt__(self, other):
-    #     if isinstance(other, Address):
-    #         return self.address1 > other.address1 and self.city > other.city and self.zipCode > other.zipCode and self.state > other.state
-    #     else:
-    #         return NotImplemented
+    def __lt__(self, other):
+        if isinstance(other, Address):
+            return self.address1 < other.address1 and self.city < other.city and self.zipCode < other.zipCode and self.state < other.state
+        else:
+            return NotImplemented
+
+    # Override greater than comparison to compare based on delivery deadline
+    def __gt__(self, other):
+        if isinstance(other, Address):
+            return self.address1 > other.address1 and self.city > other.city and self.zipCode > other.zipCode and self.state > other.state
+        else:
+            return NotImplemented
 
     # This function returns true if the given state, zipCode, city, and address1
     # match values in the compared address object

@@ -1,3 +1,4 @@
+from datetime import time
 # Deadline class used to assign Priority based on deadline
 class Deadline:
     def __init__(self, time):
@@ -44,9 +45,9 @@ class Deadline:
 class Package:
 
     # Constructor for a new Package object.
-    def __init__(self, pkg_id, address_id, weight):
+    def __init__(self, pkg_id, address, weight):
         self.pkg_id = pkg_id
-        self.address_id = address_id
+        self.address = address
         self.weight = weight
 
         # Initialize deadline, required truck, and combined_pkg to None
@@ -60,7 +61,8 @@ class Package:
     def add_status(self, status_id):
         options = ('Awaiting Pickup at HUB', 'In Route', 'Delivered')
         status = list(enumerate(options))
-        return status[status_id][1]
+        self.status = status[status_id][1]
+        return self.status
 
     # Override method to print package by ID and deadline
     def __str__(self):
@@ -70,7 +72,7 @@ class Package:
     # Override equality comparison to compare based on delivery deadline
     def __eq__(self, other):
         if isinstance(other, Package):
-            return self.pkg_id == other.pkg_id and self.deadline == other.deadline and self.weight == other.weight and self.status == other.status
+            return self.pkg_id == other.pkg_id and self.address == other.address and self.deadline == other.deadline and self.weight == other.weight
         else:
             return NotImplemented
 
@@ -84,14 +86,14 @@ class Package:
     # Override less than comparison to compare based on delivery deadline
     def __lt__(self, other):
         if isinstance(other, Package):
-            return self.deadline < other.deadline
+            return self.pkg_id < other.pkg_id and self.address < other.address and self.deadline < other.deadline and self.weight < other.weight
         else:
             return NotImplemented
 
     # Override greater than comparison to compare based on delivery deadline
     def __gt__(self, other):
         if isinstance(other, Package):
-            return self.deadline > other.deadline
+            return self.pkg_id > other.pkg_id and self.address > other.address and self.deadline > other.deadline and self.weight > other.weight
         else:
             return NotImplemented
 
@@ -102,7 +104,7 @@ class Package:
         return self.pkg_id
 
     def __hash__(self):
-        return hash((self.pkg_id, self.address_id, self.deadline, self.weight, self.status))
+        return hash((self.pkg_id, self.address, self.deadline, self.weight))
 
     # Set delivery deadline
     def add_delivery_deadline(self, deadline):
