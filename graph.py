@@ -94,9 +94,9 @@ class Graph:
         path = []
         current_vertex = end_vertex
         while current_vertex is not start_vertex:
-            path.insert(0, current_vertex.address_id)
+            path.insert(0, (current_vertex.address_id, []))
             current_vertex = current_vertex.pred_vertex
-        path.insert(0, start_vertex.address_id)
+        path.insert(0, (start_vertex.address_id, []))
         return path
 
     def print_shortest_path(self, start_vertex, end_vertex):

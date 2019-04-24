@@ -67,8 +67,7 @@ class Package:
 
     # Override method to print package by ID and deadline
     def __str__(self):
-        # return self.pkg_id + " " + str(self.deadline.deadline)
-        return self.pkg_id
+        return str(self.pkg_id)
 
     # Override equality comparison to compare based on delivery deadline
     def __eq__(self, other):

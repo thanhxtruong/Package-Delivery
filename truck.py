@@ -8,9 +8,6 @@ class Route:
         self.departure = departure
         self.arrival = arrival
 
-    def __str__(self):
-        return "Departure: " + str(self.start_vertex.address_id)
-
 
 class Truck:
     def __init__(self, id):
@@ -22,7 +19,7 @@ class Truck:
         self.departure = None
         # Pickup_time is the fixed time of when truck start its day
         self.pickup_time = None
-        self.has_driver = False
+        self.driver = None
         self.reserved_pkg = []
         self.completed_all_routes = False
 
