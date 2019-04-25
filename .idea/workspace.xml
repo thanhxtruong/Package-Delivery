@@ -2,17 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2b13357d-c192-40cc-8ad6-40c3438a5767" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../MealPlanner/.idea/MealPlanner.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MealPlanner/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MealPlanner/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MealPlanner/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MealPlanner/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MealPlanner/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../MealPlanner/nutrition.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graph.py" beforeDir="false" afterPath="$PROJECT_DIR$/graph.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Package-Delivery.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Package-Delivery.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.py" beforeDir="false" afterPath="$PROJECT_DIR$/package.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/truck.py" beforeDir="false" afterPath="$PROJECT_DIR$/truck.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -34,8 +27,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/package.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="389">
-              <caret line="69" column="30" selection-start-line="69" selection-start-column="30" selection-end-line="69" selection-end-column="30" />
+            <state>
+              <caret line="30" column="60" selection-start-line="30" selection-start-column="60" selection-end-line="30" selection-end-column="60" />
             </state>
           </provider>
         </entry>
@@ -61,8 +54,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="362">
-              <caret line="884" column="61" lean-forward="true" selection-start-line="872" selection-start-column="14" selection-end-line="884" selection-end-column="61" />
+            <state relative-caret-position="175">
+              <caret line="936" column="25" selection-start-line="936" selection-start-column="25" selection-end-line="936" selection-end-column="25" />
               <folding>
                 <element signature="e#45#55#0" expanded="true" />
               </folding>
@@ -90,22 +83,7 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>dest_in</find>
-      <find>merge_sort</find>
-      <find>merge</find>
-      <find>from_ver</find>
-      <find>from</find>
-      <find>from_vertex</find>
-      <find>previous_truck</find>
-      <find>9</find>
-      <find>create_de</find>
-      <find>&lt;</find>
-      <find>pickup_packages</find>
-      <find>add_pack</find>
-      <find>item</find>
-      <find>pickup_time</find>
       <find>later_pickup_time</find>
-      <find>route</find>
       <find>add_rou</find>
       <find>has_driver</find>
       <find>pkg_dict.pop</find>
@@ -118,8 +96,23 @@
       <find>update_pk</find>
       <find>pkg_dict</find>
       <find>same_route_set_list</find>
-      <find>deadline_set</find>
       <find>later_pick</find>
+      <find>prioritize</find>
+      <find>update_pkg</find>
+      <find>deadline_set</find>
+      <find>pickup_packages</find>
+      <find>pop</find>
+      <find>update</find>
+      <find>required_truck</find>
+      <find>update_</find>
+      <find>truck.reser</find>
+      <find>packages_per</find>
+      <find>distance</find>
+      <find>print_pkg_loading</find>
+      <find>with open</find>
+      <find>sending</find>
+      <find>route</find>
+      <find>truck_route</find>
     </findStrings>
     <replaceStrings>
       <replace>destination</replace>
@@ -135,6 +128,7 @@
       <replace>&gt;</replace>
       <replace>item</replace>
       <replace>pkg_to_update</replace>
+      <replace>truck</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -154,7 +148,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="952" />
     <option name="width" value="977" />
     <option name="height" value="1038" />
@@ -171,10 +165,6 @@
             <path>
               <item name="Package-Delivery" type="b2602c69:ProjectViewProjectNode" />
               <item name="Package-Delivery" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Package-Delivery" type="b2602c69:ProjectViewProjectNode" />
-              <item name="MealPlanner" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -251,7 +241,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="838" extended-state="7" />
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
@@ -269,25 +259,11 @@
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" x="-1598" y="119" width="1791" height="523" id="Run" order="3" sideWeight="0.49867898" weight="0.34919572" />
-      <window_info active="true" anchor="right" id="Debug" order="4" sideWeight="0.4993395" visible="true" weight="0.3538874" />
+      <window_info active="true" anchor="right" x="-1598" y="119" width="1791" height="523" id="Run" order="3" sideWeight="0.49867898" visible="true" weight="0.34919572" />
+      <window_info anchor="right" id="Debug" order="4" sideWeight="0.4993395" weight="0.3538874" />
     </layout>
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>953</line>
-          <option name="timeStamp" value="207" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>923</line>
-          <option name="timeStamp" value="252" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="self.adjacency_list[&lt;graph.Vertex object at 0x043FE570&gt;]" />
@@ -296,11 +272,6 @@
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateExpression">
-      <expression>
-        <expression-string>sorted_deadline_set</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
       <expression>
         <expression-string>list(pkg_dict.values())</expression-string>
         <language-id>Python</language-id>
@@ -312,32 +283,37 @@
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>pkg_dict.keys()</expression-string>
+        <expression-string>len(package_list)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>graph</expression-string>
+        <expression-string>package_list</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>list(trucks[0].routes.keys())</expression-string>
+        <expression-string>package.deadline is not None</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>trucks[0].routes.keys()</expression-string>
+        <expression-string>len(pkg_dict.values())</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>trucks[0].routes</expression-string>
+        <expression-string>truck.routes.get(route)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>trucks[0].routes[&lt;truck.Route object at 0x03A9BA50&gt;]</expression-string>
+        <expression-string>dest_pkg_tuple[1]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>truck.routes</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -417,38 +393,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/truck.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="30" selection-start-line="8" selection-start-column="30" selection-end-line="8" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="549">
-          <caret line="1740" selection-start-line="1740" selection-end-line="1740" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/graph.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="219">
           <caret line="96" selection-start-line="96" selection-end-line="96" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/package.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="389">
-          <caret line="69" column="30" selection-start-line="69" selection-start-column="30" selection-end-line="69" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37-32/Lib/codecs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="219">
-          <caret line="309" selection-start-line="309" selection-end-line="309" />
         </state>
       </provider>
     </entry>
@@ -459,10 +407,45 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="549">
+          <caret line="1740" selection-start-line="1740" selection-end-line="1740" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37-32/Lib/codecs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="610">
+          <caret line="332" selection-start-line="332" selection-end-line="332" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/truck.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="30" selection-start-line="8" selection-start-column="30" selection-end-line="8" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/package.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret line="30" column="60" selection-start-line="30" selection-start-column="60" selection-end-line="30" selection-end-column="60" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37-32/Lib/csv.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="227">
+          <caret line="154" selection-start-line="154" selection-end-line="154" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="362">
-          <caret line="884" column="61" lean-forward="true" selection-start-line="872" selection-start-column="14" selection-end-line="884" selection-end-column="61" />
+        <state relative-caret-position="175">
+          <caret line="936" column="25" selection-start-line="936" selection-start-column="25" selection-end-line="936" selection-end-column="25" />
           <folding>
             <element signature="e#45#55#0" expanded="true" />
           </folding>
