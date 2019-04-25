@@ -360,26 +360,35 @@ def print_pkg_loading(package_list, required_truck, address, arrival):
 
 
 def output_truck_routes():
-    truck_route_file = open('routes.csv', 'a')
-    truck_route_file.seek(0, 2)
-    wr = csv.DictWriter(truck_route_file, fieldnames=truck_fields, lineterminator='\n')
+    # Set up output file for trucks' routes
+    truck_route = open('routes.csv', 'w')
+
+    truck_fields = ('Truck', 'Departure', 'Departure Time', 'Arrival', 'Arrival Time', 'Route', 'Package(s) Delivered')
+    truck_wr = csv.DictWriter(truck_route, fieldnames=truck_fields, lineterminator='\n')
+
+    truck_wr.writeheader()
+    truck_route.seek(0, 2)
+    wr = csv.DictWriter(truck_route, fieldnames=truck_fields, lineterminator='\n')
 
     for truck in trucks:
         for route in truck.routes.keys():
             departure_address = list(address_dict.keys())[route.start_vertex.address_id - 1]
             destination_address = list(address_dict.keys())[route.end_vertex.address_id - 1]
             wr.writerow({'Truck': truck.id, 'Departure': departure_address, 'Departure Time': str(route.departure), 'Arrival': destination_address, 'Arrival Time': route.arrival})
-            count = 1
+            count = 0
             for dest_pkg_tuple in truck.routes.get(route):
                 destination_address = list(address_dict.keys())[dest_pkg_tuple[0] - 1]
                 package_list = dest_pkg_tuple[1]
                 if len(package_list) > 0:
                     packages = ''
-                    for package in package_list:
-                        if count < len(package_list):
-                            packages += str(package.pkg_id) + ', '
-                        count += 1
-                wr.writerow({'Route': destination_address, 'Package(s) Delivered': packages})
+                    for package_index in range(len(package_list)):
+                        if package_index == len(package_list) - 1:
+                            packages += str(package_list[package_index].pkg_id)
+                        else:
+                            packages += str(package_list[package_index].pkg_id) + ', '
+                    wr.writerow({'Route': destination_address, 'Package(s) Delivered': packages})
+                else:
+                    wr.writerow({'Route': destination_address})
 
 
 # This function prints packages picked up at HUB
@@ -396,7 +405,8 @@ def print_pkg_pickup(package_list, required_truck, arrival):
 
 def get_user_input():
     prompts = ["Enter a package ID: ", "Enter delivery address: ", "Enter delivery city: ", "Enter delivery zip code: ", "Enter delivery state: ", "Enter delivery deadline: ", "Enter package weight: "]
-    input_parameters = ['9', '300 State St', 'Salt Lake City', '84103', 'UT', 'EOD', '2']
+    input_parameters = ['27', '1060 Dalton Ave S', 'Salt Lake City', '84104', 'UT', 'EOD', '5']
+    # input_parameters = []
     # print("Enter the following information for the package to check status:")
     # for prompt_index in range(len(prompts)):
     #     user_input = input(prompts[prompt_index])
@@ -936,39 +946,6 @@ def update_delivery_route(truck):
 
     output_truck_routes()
 
-    # print("==============================================================================")
-    # print("Routes for Truck %d: " % truck.id)
-    # print('')
-    #
-    # for route in truck.routes.keys():
-    #     departure_address = list(address_dict.keys())[route.start_vertex.address_id - 1]
-    #     destination_address = list(address_dict.keys())[route.end_vertex.address_id - 1]
-    #     print("Departure: " + str(route.departure))
-    #     print(departure_address)
-    #     print('------------------------------------------------')
-    #     print("Arrival: " + str(route.arrival))
-    #     print(destination_address)
-    #     print('------------------------------------------------')
-    #     print("Route:")
-    #     count = 1
-    #     for dest_pkg_tuple in truck.routes.get(route):
-    #         destination_address = list(address_dict.keys())[dest_pkg_tuple[0] - 1]
-    #         print(destination_address)
-    #         package_list = dest_pkg_tuple[1]
-    #         if len(package_list) > 0:
-    #             print('')
-    #             print("Deliver Package(s): ", end='')
-    #             for package in package_list:
-    #                 print(package, end=' ')
-    #                 print('')
-    #         if count < len(truck.routes.keys()):
-    #             print('\t\t|')
-    #             print('\t\t|')
-    #         count += 1
-    #     print('***********************************************************************')
-    # print("Total packages delivered: " + str(truck.total_packages))
-    # print("==========================================================================")
-
 
 def simulate_delivery_routes(current_time):
     for truck in trucks:
@@ -1030,6 +1007,14 @@ def remove_package(package_to_remove):
             else:
                 pkg_dict.pop(package_to_remove.address)
 
+def print_main_menu():
+    print("Menu:")
+    print("\t1. Start delivery")
+    print("\t2. Change current time")
+    print("\t3. Check package status")
+    print("\t4. Update package")
+    print("\t5. Exit")
+
 
 if __name__ == "__main__":
     # Set up output file for package loading
@@ -1040,15 +1025,6 @@ if __name__ == "__main__":
 
     pkg_wr.writeheader()
     pkg_loading_file.close()
-
-    # Set up output file for trucks' routes
-    truck_route = open('routes.csv', 'w')
-
-    truck_fields = ('Truck', 'Departure', 'Departure Time', 'Arrival', 'Arrival Time', 'Route', 'Package(s) Delivered')
-    truck_wr = csv.DictWriter(truck_route, fieldnames=truck_fields, lineterminator='\n')
-
-    truck_wr.writeheader()
-    truck_route.close()
 
     trucks = []
 
@@ -1084,27 +1060,21 @@ if __name__ == "__main__":
 
     # Reset truck's data
     for truck in trucks:
-        truck.current_location = hub_address
+        truck.current_location = graph.get_vertex(address_dict.get(hub_address))
         truck.departure = time
 
     # Delivery simulation and UI
-
-    print("Menu:")
-    print("\t1. Start delivery")
-    print("\t2. Change current time")
-    print("\t3. Check package status")
-    print("\t4. Update package")
-    print("\t5. Exit")
+    print_main_menu()
 
     user_selection = 1
 
     while not user_selection == 5:
-        user_selection = input("Select a number from 1-4 from the menu above: ")
+        user_selection = input("Select a number from 1-5 from the menu above: ")
         valid_selection = False
         while not valid_selection:
             if not user_selection.isnumeric():
                 user_selection = input("Invalid selection. Enter a number from 1 - 4: ")
-            elif int(user_selection) < 1 or int(user_selection) > 4:
+            elif int(user_selection) < 1 or int(user_selection) > 5:
                 user_selection = input("Invalid selection. Enter a number from 1 - 4: ")
             else:
                 user_selection = int(user_selection)
@@ -1112,6 +1082,7 @@ if __name__ == "__main__":
 
         if user_selection == 1:
             current_time = time(8, 0, 0)
+            print('')
             print("The current time is:\t" + current_time.strftime('%H: %M'))
             print('')
             simulate_delivery_routes(current_time)
@@ -1124,6 +1095,10 @@ if __name__ == "__main__":
             simulate_delivery_routes(current_time)
 
         if user_selection == 3:
+            current_time = time(8, 0, 0)
+            print('')
+            print("The current time is:\t" + current_time.strftime('%H: %M'))
+            print('')
             # Update package status
             update_pkg_status(current_time)
             update_truck_routes(current_time)
@@ -1194,63 +1169,77 @@ if __name__ == "__main__":
                     print("Choose an option below to modify delivery requirements")
                     print("Menu:")
                     print("\t1. Change delivery address")
-                    print("\t2. Check delivery deadline")
+                    print("\t2. Change delivery deadline")
                     print("\t3. Go back")
 
                     user_selection = 1
-                    while not user_selection == 3:
-                        user_selection = input("Select a number from 1-4 from the menu above: ")
-                        if int(user_selection) == 1:
-                            # new_street = input("Enter a street address: ")
-                            # new_city = input("Enter a new city: ")
-                            # new_zipCode = input("Enter a new zip code: ")
-                            # new_state = input("Enter a new state: ")
+                    while not int(user_selection) == 3:
+                        user_selection = input("Select a number from 1-3 from the menu above: ")
+                        valid_selection = False
+                        while not valid_selection:
+                            if not user_selection.isnumeric():
+                                user_selection = input("Invalid selection. Enter a number from 1 - 3: ")
+                            elif int(user_selection) < 1 or int(user_selection) > 3:
+                                user_selection = input("Invalid selection. Enter a number from 1 - 3: ")
+                            else:
+                                user_selection = int(user_selection)
+                                valid_selection = True
 
-                            new_street = '410 S State St'
-                            new_city = 'Salt Lake City'
-                            new_zipCode = '84111'
-                            new_state = 'UT'
+                        if 1 <= user_selection <= 2:
+                            if user_selection == 1:
+                                # new_street = input("Enter a street address: ")
+                                # new_city = input("Enter a new city: ")
+                                # new_zipCode = input("Enter a new zip code: ")
+                                # new_state = input("Enter a new state: ")
 
-                            new_address = Address(new_street, new_city, new_zipCode, new_state)
-                            # Get address from address_dict{}
-                            new_address = list(address_dict.keys())[address_dict.get(new_address)-1]
+                                new_street = '410 S State St'
+                                new_city = 'Salt Lake City'
+                                new_zipCode = '84111'
+                                new_state = 'UT'
 
-                            # Remove pkg from pkg_dict and pkg_hash_table
-                            remove_package(pkg_to_update)
+                                new_address = Address(new_street, new_city, new_zipCode, new_state)
+                                # Get address from address_dict{}
+                                new_address = list(address_dict.keys())[address_dict.get(new_address)-1]
 
-                            # Update package's address
-                            pkg_to_update.address = new_address
+                                # Remove pkg from pkg_dict and pkg_hash_table
+                                remove_package(pkg_to_update)
 
-                        elif int(user_selection) == 2:
-                            prompt = "Enter new delivery deadline: "
-                            new_delivery_deadline = get_new_time(prompt)
-                            remove_package(pkg_to_update)
-                            pkg_to_update.deadline = new_delivery_deadline
+                                # Update package's address
+                                pkg_to_update.address = new_address
 
-                        # Add package back into hash_table and pkg_dict
-                        pkg_hash_table.insert(pkg_to_update)
-                        if pkg_to_update.address not in pkg_dict.keys():
-                            pkg_dict[pkg_to_update.address] = [pkg_to_update]
+                            elif user_selection == 2:
+                                prompt = "Enter new delivery deadline: "
+                                new_delivery_deadline = get_new_time(prompt)
+                                remove_package(pkg_to_update)
+                                pkg_to_update.deadline = new_delivery_deadline
+
+                            # Add package back into hash_table and pkg_dict
+                            pkg_hash_table.insert(pkg_to_update)
+                            if pkg_to_update.address not in pkg_dict.keys():
+                                pkg_dict[pkg_to_update.address] = [pkg_to_update]
+                            else:
+                                package_list = pkg_dict.get(pkg_to_update.address)
+                                package_list.append(pkg_to_update)
+
+                            # Iterate through the truck's routes and transfer package to existing route
+                            for route in affected_truck.routes.keys():
+                                for dest_pkg_tuple in affected_truck.routes.get(route):
+                                    if len(dest_pkg_tuple[1]) > 0:
+                                        for package in dest_pkg_tuple[1]:
+                                            package.truck = affected_truck.id
+
+                            update_pkg_dict()
+
+                            # Clear truck's routes
+                            affected_truck.routes.clear()
+                            affected_truck.reserved_pkg.clear()
+                            affected_truck.completed_all_routes = False
+
+                            prioritize_pkg_dict()
+                            update_delivery_route(affected_truck)
+
                         else:
-                            package_list = pkg_dict.get(pkg_to_update.address)
-                            package_list.append(pkg_to_update)
-
-                        # Iterate through the truck's routes and transfer package to existing route
-                        for route in affected_truck.routes.keys():
-                            for dest_pkg_tuple in affected_truck.routes.get(route):
-                                if len(dest_pkg_tuple[1]) > 0:
-                                    for package in dest_pkg_tuple[1]:
-                                        package.truck = affected_truck.id
-
-                        update_pkg_dict()
-
-                        # Clear truck's routes
-                        affected_truck.routes.clear()
-                        affected_truck.reserved_pkg.clear()
-                        affected_truck.completed_all_routes = False
-
-                        prioritize_pkg_dict()
-                        update_delivery_route(affected_truck)
+                            print_main_menu()
 
 
 
