@@ -2,13 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2b13357d-c192-40cc-8ad6-40c3438a5767" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package_data.csv" beforeDir="false" afterPath="$PROJECT_DIR$/package_data.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package_loading.csv" beforeDir="false" afterPath="$PROJECT_DIR$/package_loading.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes.csv" beforeDir="false" afterPath="$PROJECT_DIR$/routes.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/truck.py" beforeDir="false" afterPath="$PROJECT_DIR$/truck.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -57,8 +53,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="548">
-              <caret line="585" column="31" lean-forward="true" selection-start-line="582" selection-start-column="18" selection-end-line="585" selection-end-column="31" />
+            <state relative-caret-position="366">
+              <caret line="1044" column="97" selection-start-line="1044" selection-start-column="97" selection-end-line="1044" selection-end-column="97" />
               <folding>
                 <element signature="e#45#55#0" expanded="true" />
               </folding>
@@ -86,10 +82,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>update</find>
-      <find>required_truck</find>
-      <find>update_</find>
-      <find>truck.reser</find>
       <find>packages_per</find>
       <find>distance</find>
       <find>print_pkg_loading</find>
@@ -116,6 +108,10 @@
       <find>package.set_c</find>
       <find>package.add_de</find>
       <find>sorted</find>
+      <find>.index</find>
+      <find>packages_per_route</find>
+      <find>address</find>
+      <find>latest_pick</find>
     </findStrings>
     <replaceStrings>
       <replace>destination</replace>
@@ -244,11 +240,11 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <frame x="762" y="0" width="781" height="830" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="1" visible="true" weight="0.117292225" />
+      <window_info content_ui="combo" id="Project" order="1" weight="0.24204703" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="0" weight="0.32956153" />
       <window_info anchor="bottom" id="Event Log" order="1" sideWeight="0.5006605" side_tool="true" weight="0.39886847" />
@@ -262,9 +258,20 @@
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info active="true" anchor="right" x="-1598" y="119" width="1791" height="523" id="Run" order="3" sideWeight="0.49867898" visible="true" weight="0.34919572" />
+      <window_info anchor="right" x="-1598" y="119" width="1791" height="523" id="Run" order="3" sideWeight="0.49867898" weight="0.66390043" />
       <window_info anchor="right" id="Debug" order="4" sideWeight="0.4993395" weight="0.31367293" />
     </layout>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>1488</line>
+          <option name="timeStamp" value="323" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateExpression">
@@ -443,10 +450,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37-32/Lib/datetime.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="226">
+          <caret line="1161" column="6" selection-start-line="1161" selection-start-column="6" selection-end-line="1161" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="548">
-          <caret line="585" column="31" lean-forward="true" selection-start-line="582" selection-start-column="18" selection-end-line="585" selection-end-column="31" />
+        <state relative-caret-position="366">
+          <caret line="1044" column="97" selection-start-line="1044" selection-start-column="97" selection-end-line="1044" selection-end-column="97" />
           <folding>
             <element signature="e#45#55#0" expanded="true" />
           </folding>
