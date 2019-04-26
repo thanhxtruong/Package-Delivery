@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2b13357d-c192-40cc-8ad6-40c3438a5767" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/graph.py" beforeDir="false" afterPath="$PROJECT_DIR$/graph.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package_loading.csv" beforeDir="false" afterPath="$PROJECT_DIR$/package_loading.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes.csv" beforeDir="false" afterPath="$PROJECT_DIR$/routes.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/truck.py" beforeDir="false" afterPath="$PROJECT_DIR$/truck.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,8 +19,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/truck.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="8" column="30" selection-start-line="8" selection-start-column="30" selection-end-line="8" selection-end-column="30" />
+            <state relative-caret-position="387">
+              <caret line="72" column="72" selection-start-line="72" selection-start-column="72" selection-end-line="72" selection-end-column="72" />
             </state>
           </provider>
         </entry>
@@ -53,8 +55,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="322">
-              <caret line="1241" column="45" selection-start-line="1241" selection-start-column="45" selection-end-line="1241" selection-end-column="45" />
+            <state relative-caret-position="498">
+              <caret line="1056" lean-forward="true" selection-start-line="1056" selection-end-line="1056" />
               <folding>
                 <element signature="e#45#55#0" expanded="true" />
               </folding>
@@ -65,8 +67,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/graph.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="778">
-              <caret line="91" selection-start-line="91" selection-end-line="91" />
+            <state relative-caret-position="-154">
+              <caret line="23" column="56" selection-start-line="23" selection-start-column="56" selection-end-line="23" selection-end-column="56" />
             </state>
           </provider>
         </entry>
@@ -82,15 +84,11 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>pkg_dict[</find>
-      <find>dest_in_route.append</find>
-      <find>300 State</find>
       <find>packages_to_deliver</find>
       <find>tuple</find>
       <find>set</find>
       <find>update_pk</find>
       <find>pkg_dict</find>
-      <find>same_route_set_list</find>
       <find>later_pick</find>
       <find>prioritize</find>
       <find>update_pkg</find>
@@ -112,6 +110,10 @@
       <find>the cur</find>
       <find>get_shorte</find>
       <find>required_truck.cu</find>
+      <find>same_route_set_list</find>
+      <find>reserved_pkg</find>
+      <find>search_truck</find>
+      <find>vertex.</find>
     </findStrings>
     <replaceStrings>
       <replace>destination</replace>
@@ -140,9 +142,9 @@
         <option value="$PROJECT_DIR$/data_structure.py" />
         <option value="$PROJECT_DIR$/chaininghashtable.py" />
         <option value="$PROJECT_DIR$/address.py" />
-        <option value="$PROJECT_DIR$/graph.py" />
-        <option value="$PROJECT_DIR$/truck.py" />
         <option value="$PROJECT_DIR$/package.py" />
+        <option value="$PROJECT_DIR$/truck.py" />
+        <option value="$PROJECT_DIR$/graph.py" />
         <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
@@ -240,7 +242,8 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="838" extended-state="7" />
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
       <window_info content_ui="combo" id="Project" order="1" visible="true" weight="0.117292225" />
@@ -257,50 +260,9 @@
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info active="true" anchor="right" x="-1598" y="119" width="1791" height="523" id="Run" order="3" sideWeight="0.49867898" visible="true" weight="0.34919572" />
-      <window_info anchor="right" id="Debug" order="4" sideWeight="0.4993395" weight="0.3538874" />
+      <window_info anchor="right" x="-1598" y="119" width="1791" height="523" id="Run" order="3" sideWeight="0.49867898" weight="0.34919572" />
+      <window_info active="true" anchor="right" id="Debug" order="4" sideWeight="0.4993395" visible="true" weight="0.40080428" />
     </layout>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>1238</line>
-          <option name="timeStamp" value="299" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>768</line>
-          <option name="timeStamp" value="304" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>801</line>
-          <option name="timeStamp" value="305" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>847</line>
-          <option name="timeStamp" value="306" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>923</line>
-          <option name="timeStamp" value="307" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/main.py</url>
-          <line>1126</line>
-          <option name="timeStamp" value="310" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
-    <watches-manager>
-      <configuration name="PythonConfigurationType">
-        <watch expression="self.adjacency_list[&lt;graph.Vertex object at 0x043FE570&gt;]" />
-      </configuration>
-    </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateExpression">
@@ -467,22 +429,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/truck.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="30" selection-start-line="8" selection-start-column="30" selection-end-line="8" selection-end-column="30" />
+        <state relative-caret-position="387">
+          <caret line="72" column="72" selection-start-line="72" selection-start-column="72" selection-end-line="72" selection-end-column="72" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/graph.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="778">
-          <caret line="91" selection-start-line="91" selection-end-line="91" />
+        <state relative-caret-position="-154">
+          <caret line="23" column="56" selection-start-line="23" selection-start-column="56" selection-end-line="23" selection-end-column="56" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="1241" column="45" selection-start-line="1241" selection-start-column="45" selection-end-line="1241" selection-end-column="45" />
+        <state relative-caret-position="498">
+          <caret line="1056" lean-forward="true" selection-start-line="1056" selection-end-line="1056" />
           <folding>
             <element signature="e#45#55#0" expanded="true" />
           </folding>

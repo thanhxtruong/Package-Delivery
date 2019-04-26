@@ -1,8 +1,6 @@
 # Name: Thanh Truong. StudentID: #001062385
 
 import csv
-import sys
-from inspect import currentframe, getframeinfo
 from datetime import datetime, time, timedelta, date
 from operator import attrgetter
 from queue import PriorityQueue
@@ -13,42 +11,59 @@ from truck import Truck, Route
 from chaininghashtable import ChainingHashTable
 
 # Dictionary to hold (address/address_id) pairs
+# This dictionary is used for easy look-up of address using address_id, which is used in
+# graph's vertices
 address_dict = {}
 # Dictionary to hold (address_id/[packages]) pairs
+# Package data from raw csv file is loaded into this dictionary, which is then use to create
+# the PriorityQueue.
+# By the time the PriorityQueue is created, pkg_dict will be empty
 pkg_dict = {}
-# Set of delivery deadlines used to set Priority
+# All packages' delivery deadlines are put into this set, which is later used to assign priority
 deadline_set = set()
 # List of all sets in the same route
+# The list of all packages that are required to be delivered together in the same route are
+# first put into a set
+# This list contains all of the created sets
 same_route_set_list = []
-# Priority queue organized by address_id and priority
+# Priority queue organized by address_id and priority.
+# By the time all packages have been loaded onto trucks, PriorityQueue will be empty.
 dest_priority_queue = PriorityQueue()
-# List of all graph with vertices representing packages that are to be delivered together in the same route
+# List of all sub-graph with vertices to which packages are to be delivered together in the same route
 same_route_combined_sets = []
-# List of all vertices in graph
+# List of all vertices in a graph
 vertex_list = []
 graph = Graph()
 # Dictionary of packages that require pick-up later
+# While downloading raw data from the csv file, packages that have a specific pick-up time
+# requirements are temporarily added to this dictionary, which will be later added to pkg_dict{}
+# after picked up at HUB
 pickup_packages = {}
-# Chaining Hash Table
+# Chaining Hash Table holding package data for status look-up
 pkg_hash_table = ChainingHashTable()
 
+# Maximum number of packages a truck can carry
 MAX_PKG_PER_TRUCK = 16
+# Truck's speed
 SPEED = 18
+# List of all trucks available at WGUPS
 trucks = []
 
 
+# This function is used to load raw distance data from csv file into a Graph data structure.
+# This function returns the address at HUB (hub_address).
 def load_graph(filename):
 
     # Open file, read package data one line at a time skipping the first row (header).
     with open(filename) as csvfile:
         # Flag to save address for HUB
         hub_address_saved = False
-        index = 1  # Index for address_dict key/value pair
+        # Index to assign address_id for each address
+        index = 1
         readCSV = csv.reader(csvfile)
         # Skip the header
         next(readCSV)
         for row in readCSV:
-            # print(row)
             # Get the address (first element) then split it by ','.
             # The result is another array of address data
             split_address = row[0].split(',')
@@ -61,7 +76,6 @@ def load_graph(filename):
                 hub_address = address
                 hub_address_saved = True
             # Add address to address_dict
-            # TODO: Remove address_dict
             address_dict[address] = index
 
             _vertex = Vertex(index)
@@ -83,20 +97,13 @@ def load_graph(filename):
             for travel_distance in dist_list:
                 graph.add_undirected_edge(_vertex, vertex_list[address_list_index], travel_distance)
                 address_list_index += 1
-            # for _vertex, adj_list in graph.adjacency_list.items():
-            #     address_list_index = 0
-            #     for travel_distance in dist_list:
-            #         graph.add_undirected_edge(_vertex, vertex_list[address_list_index], travel_distance)
-            #         address_list_index += 1
 
             index += 1
 
-            # graph.print_graph()
     return hub_address
 
 
-# This function iterates through the address_dict{} and returns the address_id (key) for a given set of string values
-# for (state, zipCode, city, address1)
+# This function iterates through the address_dict{} and returns the address_id (value) for a given set of string values
 def get_address_from_address_dict(address1, city, zipCode, state):
     for address_obj, address_id in address_dict.items():
         address = address_obj
@@ -1007,6 +1014,7 @@ def remove_package(package_to_remove):
             else:
                 pkg_dict.pop(package_to_remove.address)
 
+
 def print_main_menu():
     print("Menu:")
     print("\t1. Start delivery")
@@ -1018,32 +1026,32 @@ def print_main_menu():
 
 if __name__ == "__main__":
     # Set up output file for package loading
+    # Data including package, truck carrier, delivery address and delivered time  are output into
+    # a csv file named "packaged_loading.csv"
     pkg_loading_file = open('package_loading.csv', 'w')
-
     pkg_fields = ('PackageID', 'Truck', 'Delivery Address', 'Delivered Time')
     pkg_wr = csv.DictWriter(pkg_loading_file, fieldnames=pkg_fields, lineterminator='\n')
-
     pkg_wr.writeheader()
     pkg_loading_file.close()
 
-    trucks = []
-
     # Load data from distance table and save them into an undirected graph
-    # dist_filename = input("Enter name of distance data file: ")
     dist_filename = "distance_table.csv"
+    # Get the address at HUB
     hub_address = load_graph(dist_filename)
+    hub_vertex = graph.get_vertex(address_dict.get(hub_address))
 
-    # Create trucks and add to HUB location in graph
+    # Create trucks and add trucks to HUB location in graph
     i = 1
     while i < 4:
         truck = Truck(i)
-        # Add driver to truck
+        # Add driver to Truck 1 and 2
+        # Pre-set departure and pick-up time to 8 AM
         if i < 3:
             truck.driver = i
             truck.departure = time(8, 0, 0)
             truck.pickup_time = time(8, 0, 0)
+        truck.current_location = hub_vertex
         trucks.append(truck)
-        graph.add_truck_to_hub(truck)
         i += 1
 
     # Load data for packages and save them into a priority queue.

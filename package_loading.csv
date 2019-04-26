@@ -5,20 +5,20 @@ Holladay, UT 84117",08:11:00
 Holladay, UT 84117",08:11:00
 34,2,"4580 S 2300 E
 Holladay, UT 84117",08:11:00
-19,2,"177 W Price Ave
-Salt Lake City, UT 84115",08:28:00
-20,2,"3595 Main St
-Salt Lake City, UT 84115",08:29:00
-21,2,"3595 Main St
-Salt Lake City, UT 84115",08:29:00
 14,2,"4300 S 1300 E
-Millcreek, UT 84117",08:39:00
-31,2,"3365 S 900 W
-Salt Lake City, UT 84119",08:54:00
+Millcreek, UT 84117",08:17:00
+19,2,"177 W Price Ave
+Salt Lake City, UT 84115",08:27:00
 13,2,"2010 W 500 S
-Salt Lake City, UT 84104",09:13:00
+Salt Lake City, UT 84104",08:51:00
 39,2,"2010 W 500 S
-Salt Lake City, UT 84104",09:13:00
+Salt Lake City, UT 84104",08:51:00
+31,2,"3365 S 900 W
+Salt Lake City, UT 84119",09:10:00
+20,2,"3595 Main St
+Salt Lake City, UT 84115",09:15:00
+21,2,"3595 Main St
+Salt Lake City, UT 84115",09:15:00
 1,1,"195 W Oakland Ave
 Salt Lake City, UT 84115",08:11:00
 7,1,"1330 2100 S
@@ -34,11 +34,11 @@ Salt Lake City, UT 84115",08:31:00
 40,1,"380 W 2880 S
 Salt Lake City, UT 84115",08:31:00
 5,2,"410 S State St
-Salt Lake City, UT 84111",09:23:00
+Salt Lake City, UT 84111",09:31:00
 37,2,"410 S State St
-Salt Lake City, UT 84111",09:23:00
+Salt Lake City, UT 84111",09:31:00
 38,2,"410 S State St
-Salt Lake City, UT 84111",09:23:00
+Salt Lake City, UT 84111",09:31:00
 8,1,"300 State St
 Salt Lake City, UT 84103",08:49:00
 9,1,"300 State St
@@ -66,7 +66,7 @@ Murray, UT 84107",10:03:00
 28,1,"2835 Main St
 Salt Lake City, UT 84115",10:14:00
 36,2,"2300 Parkway Blvd
-West Valley City, UT 84119",09:45:00
+West Valley City, UT 84119",09:53:00
 27,3,"1060 Dalton Ave S
 Salt Lake City, UT 84104",10:48:00
 35,3,"1060 Dalton Ave S
@@ -74,7 +74,7 @@ Salt Lake City, UT 84104",10:48:00
 23,3,"5100 South 2700 West
 Salt Lake City, UT 84118",11:11:00
 18,2,"1488 4800 S
-Salt Lake City, UT 84123",09:58:00
+Salt Lake City, UT 84123",10:06:00
 17,3,"3148 S 1100 W
 Salt Lake City, UT 84119",11:27:00
 12,3,"3575 W Valley Central Station bus Loop
@@ -84,6 +84,6 @@ Salt Lake City, UT 84118",12:04:00
 10,3,"600 E 900 South
 Salt Lake City, UT 84105",12:40:00
 3,2,"233 Canyon Rd
-Salt Lake City, UT 84103",10:34:00
+Salt Lake City, UT 84103",10:42:00
 22,3,"6351 South 900 East
 Murray, UT 84121",13:07:00

@@ -1,37 +1,19 @@
+# The Vertex class represents each node of the Graph class
 class Vertex:
     def __init__(self, address_id):
         self.address_id = address_id
         self.pred_vertex = None
-        self.distance = float('inf')                 # shortest path distance from start_vertex
-        self.trucks = []                        # all trucks currently at this vertex
-        # TODO: Add pred
-
-    # def __str__(self):
-    #     return self.address.address1
-
-    def add_truck(self, truck_id):
-        self.trucks.append(truck_id)
-
-    def search_truck(self, truck_id):
-        for truck_iter in self.trucks:
-            if truck_iter == truck_id:
-                return self
-            else:
-                return None
+        # Shortest path distance from start_vertex
+        self.distance = float('inf')
 
 
+# The Graph class holds a vertex adjacency list using a dictionary that maps each Vertex
+# on the Graph to a list of adjacent Vertex objects. Distances between vertices are also
+# stored.
 class Graph:
     def __init__(self):
         self.adjacency_list = {}
         self.edge_weights = {}
-
-    def add_truck_to_hub(self, truck):
-        i = 0
-        for vertex in self.adjacency_list.keys():
-            if i == 0:
-                vertex.add_truck(truck.id)
-                truck.current_location = vertex
-                return
 
     def add_vertex(self, new_vertex):
         self.adjacency_list[new_vertex] = []
@@ -55,7 +37,6 @@ class Graph:
             if vertex.address_id == address_id:
                 return vertex
 
-    # TODO Verify this function work
     def dijkstra_shortest_path(self, start_vertex):
         # Put all vertices in an unvisited queue.
         unvisited_queue = []
@@ -87,7 +68,6 @@ class Graph:
                     adj_vertex.distance = alternative_path_distance
                     adj_vertex.pred_vertex = current_vertex
 
-    # TODO: Verify this function work
     def get_shortest_path(self, start_vertex, end_vertex):
         self.dijkstra_shortest_path(start_vertex)
         # Start from end_vertex and build the path backwards.
