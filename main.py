@@ -52,43 +52,56 @@ trucks = []
 
 # This function is used to load raw distance data from csv file into a Graph data structure.
 # This function returns the address at HUB (hub_address).
+# NOTE: In order for this function to work properly, the csv file MUST be formatted as
+# shown.
 def load_graph(filename):
 
     # Open file, read package data one line at a time skipping the first row (header).
     with open(filename) as csvfile:
-        # Flag to save address for HUB
+
+        # Flag to save address for HUB. Once the HUB address is obtain, this flag
+        # will be changed to True to stop break from the while loop.
         hub_address_saved = False
         # Index to assign address_id for each address
         index = 1
+
         readCSV = csv.reader(csvfile)
         # Skip the header
         next(readCSV)
+
         for row in readCSV:
-            # Get the address (first element) then split it by ','.
-            # The result is another array of address data
+            # String split raw data to get each component of the Address object
             split_address = row[0].split(',')
             address1 = split_address[0]
             city = split_address[1]
             zip_code = split_address[2]
             state = split_address[3]
+
+            # Create a new Address object
             address = Address(address1, city, zip_code, state)
+
+            # Assuming the csv file is formatted with the first row containing the HUB
+            # address, this address will be saved into the global hub_address object.
             while not hub_address_saved:
                 hub_address = address
                 hub_address_saved = True
-            # Add address to address_dict
+
+            # Add address to address_dict{}
             address_dict[address] = index
 
+            # Create a new Vertex object for the new Address object and append it to
+            # the global vertex_list[]
             _vertex = Vertex(index)
             vertex_list.append(_vertex)
 
-            # Extract distance data from the input string and save into a list
+            # Extract distance data from the csv file and save into a list
             j = 1
             dist_list = []
             while not float(row[j]) == 0:
                 dist_list.append(float(row[j]))
                 j += 1
 
-            # Add vertex to graph.
+            # Add vertex to the global Graph object.
             # Save distances into the adjacency list for the new vertex
             graph.add_vertex(_vertex)
 
@@ -137,12 +150,12 @@ def add_package_to_pkg_dict(pkg_id, street_address, city, zip_code, state, weigh
     # Deadline is hardcoded to 23:00:00 if set to 'EOD'
 
     # Add each unique deadline to the deadline_set and package
-    new_package.add_delivery_deadline(deadline.time)
+    new_package.deadline = deadline.time
     deadline_set.add(deadline)
 
     # Set specific truck requirement
     if not (delivery_truck == ''):
-        new_package.set_truck(delivery_truck)
+        new_package.truck = delivery_truck
 
     # Set combined packages requirement
     if len(same_route_packages) > 0:
@@ -159,7 +172,7 @@ def add_package_to_pkg_dict(pkg_id, street_address, city, zip_code, state, weigh
         deadline_set.add(later_pickup_time)
         # Create a new package obj
         pickup_package = Package(pkg_id, hub_address, weight)
-        pickup_package.add_delivery_deadline(later_pickup_time.time)
+        pickup_package.deadline = later_pickup_time.time
         # Add pickup_package to dictionary
         if pickup_package.address not in pkg_dict.keys():
             pkg_dict[pickup_package.address] = [pickup_package]
@@ -231,8 +244,12 @@ def update_pkg_dict():
             pkg_dict.pop(package.address)
 
 
+# This function loads package data from the csv file into the global
+# pkg_dict{Address: [Packages]} dictionary.
+# NOTE: In order for this function to work properly, the csv file MUST be formatted
+# as shown.
 def load_pkg_data(filename):
-    with open(pkg_filename) as csvfile:
+    with open(filename) as csvfile:
         readCSV = csv.reader(csvfile)
         # Skip the header
         next(readCSV)
@@ -245,6 +262,9 @@ def load_pkg_data(filename):
             state = row[4]
             weight = float(row[5])
 
+            # Packages with deadline as 'EOD' are hard-coded to the last hour 23:00.
+            # Assuming it's not feasible to have deadlines that pass business hours,
+            # this is the work-around in order to assign priority.
             if row[6] == 'EOD':
                 deadline = Deadline(time(23, 0, 0))
 
@@ -265,13 +285,14 @@ def load_pkg_data(filename):
             else:
                 pickup_deadline = row[7]
 
-            # Set specific truck requirement
+            # Set specific truck requirement.
             if not (row[8] == ''):
                 delivery_truck = int(row[8])
             else:
                 delivery_truck = row[8]
 
-            # Set combined packages requirement
+            # Append all packages that are required to be delivered together to the
+            # same_route_packages[] list.
             same_route_packages = []
             if not (row[9] == ''):
                 split_list = row[9].split(',')
@@ -440,7 +461,7 @@ def get_user_input():
             deadline = time(23, 0, 0)
             valid_selection = True
 
-    input_package.add_delivery_deadline(deadline)
+    input_package.deadline = deadline
     return input_package
 
 
@@ -1055,13 +1076,12 @@ if __name__ == "__main__":
         i += 1
 
     # Load data for packages and save them into a priority queue.
-    # Priority is assigned based on deadline.
-    # Packages with combined packages constraint have the same Priority #
-    # pkg_filename = input("Enter name of package data file: ")
     pkg_filename = "package_data.csv"
     load_pkg_data(pkg_filename)
 
     create_hash_table()
+    # Priority is assigned based on deadline.
+    # Packages with combined packages constraint have the same Priority #
     prioritize_pkg_dict()
 
     create_delivery_route()

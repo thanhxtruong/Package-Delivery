@@ -1,3 +1,6 @@
+# This class holds all data related to an address as downloaded from the csv file.
+# The built-in functions are overridden to compare and hash using all attributes of
+# the Address class.
 class Address:
     def __init__(self, address, city, zip_code, state):
         self.address1 = address
@@ -8,7 +11,6 @@ class Address:
     def __str__(self):
         return str(self.address1 + '\n' + self.city + ', ' + self.state + ' ' + self.zipCode)
 
-    # Override equality comparison to compare based on delivery deadline
     def __eq__(self, other):
         if isinstance(other, Address):
             return self.address1 == other.address1 and self.city == other.city and self.zipCode == other.zipCode and self.state == other.state
@@ -37,8 +39,8 @@ class Address:
         else:
             return NotImplemented
 
-    # This function returns true if the given state, zipCode, city, and address1
-    # match values in the compared address object
+    # This function returns True if the given state, zipCode, city, and address1
+    # match values in the compared Address object
     def compare_address(self, address1, city, zipCode, state):
         if self.state == state and self.zipCode == zipCode and self.city == city and self.address1 == address1:
             return True
