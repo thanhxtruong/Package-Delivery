@@ -39,7 +39,7 @@ graph = Graph()
 # requirements are temporarily added to this dictionary, which will be later added to pkg_dict{}
 # after picked up at HUB
 pickup_packages = {}
-# Chaining Hash Table holding package data for status look-up
+# Chaining Hash Table holding package data for easy status look-up
 pkg_hash_table = ChainingHashTable()
 
 # Maximum number of packages a truck can carry
@@ -132,6 +132,8 @@ def get_address_from_pkg_dict(pkg_id):
                 return address_id
 
 
+# This function takes all values for Package's attributes, create a new Package object,
+# and add it to the pkg_dict{} dictionary
 # pkg_id  - int
 # weight - float
 # deadline - Deadline
@@ -143,13 +145,11 @@ def add_package_to_pkg_dict(pkg_id, street_address, city, zip_code, state, weigh
     address_tuple = get_address_from_address_dict(street_address, city, zip_code, state)
     vertex_address = address_tuple[1]
 
-    # Create package obj
+    # Create a new Package object.
     new_package = Package(pkg_id, vertex_address, weight)
 
-    # Set delivery deadline
-    # Deadline is hardcoded to 23:00:00 if set to 'EOD'
-
-    # Add each unique deadline to the deadline_set and package
+    # Set delivery deadline.
+    # Add each unique deadline to the deadline_set.
     new_package.deadline = deadline.time
     deadline_set.add(deadline)
 
@@ -157,7 +157,9 @@ def add_package_to_pkg_dict(pkg_id, street_address, city, zip_code, state, weigh
     if not (delivery_truck == ''):
         new_package.truck = delivery_truck
 
-    # Set combined packages requirement
+    # Add all packages that are required to be delivered together in the same route to
+    # a set, which is then appended to the same_route_set_list[same_route_sets].
+    # This list of sets will be used to ensure packages are delivered together.
     if len(same_route_packages) > 0:
         temp_set = set()
         temp_set.add(int(new_package.pkg_id))
@@ -166,14 +168,24 @@ def add_package_to_pkg_dict(pkg_id, street_address, city, zip_code, state, weigh
 
         same_route_set_list.append(temp_set)
 
-    # Add route back to HUB if package has a pickup_time
+    # If package has a specific pickup time requirement, create a new Package with
+    # delivery address to HUB. Append the Package object with the actual delivery
+    # address to the pickup_packages{} dictionary for temporary storage.
+    # Packages in the pickup_packages{} dictionary will be later added to the pkg_dict{}
+    # after picked up by truck at HUB.
     if not (later_pickup_time == ''):
-        # Add deadline to deadline_set
+
+        # Add pickup_time to deadline_set.
         deadline_set.add(later_pickup_time)
-        # Create a new package obj
+
+        # Create a new Package object.
         pickup_package = Package(pkg_id, hub_address, weight)
+
+        # Set the delivery deadline to the pickup_time as package must be picked up
+        # anytime after this deadline.
         pickup_package.deadline = later_pickup_time.time
-        # Add pickup_package to dictionary
+
+        # Add Package with HUB address to pkg_dict{}
         if pickup_package.address not in pkg_dict.keys():
             pkg_dict[pickup_package.address] = [pickup_package]
         else:
@@ -187,6 +199,8 @@ def add_package_to_pkg_dict(pkg_id, street_address, city, zip_code, state, weigh
             pkg_list2 = pickup_packages.get(new_package.address)
             pkg_list2.append(new_package)
 
+    # If package does not have a specific pickup_time requirement, then add the
+    # new Package to pkg_dict{}.
     else:
         # Add package to dictionary
         if new_package.address not in pkg_dict.keys():
@@ -275,6 +289,8 @@ def load_pkg_data(filename):
                 minute = int(split_time[1].split(' ')[0])
                 deadline = Deadline(time(hour, minute, 0))
 
+            # If the package has a specific pick-up time requirement, create a new
+            # Deadline object for the required time.
             if not (row[7] == ''):
                 # Create a new Deadline using pickup_time
                 split_time = row[7].split(':')
@@ -301,6 +317,7 @@ def load_pkg_data(filename):
             else:
                 same_route_packages = row[9]
 
+            # Create a new Package object and add it to the pkg_dict{} dictionary.
             add_package_to_pkg_dict(pkg_id, street_address, city, zip_code, state, weight, deadline, pickup_deadline, delivery_truck, same_route_packages)
 
     # Go through list of same_route_sets to combine sets
@@ -333,19 +350,25 @@ def load_pkg_data(filename):
         same_route_combined_sets.append(replaced_set)
 
 
+# This function iterates through the pkg_dict{} dictionary and create a PriorityQueue.
+# Priority is assigned based on delivery deadline.
+# Packages with no specified delivery deadline but are required to be delivered together
+# will take the priority of the package with the earliest delivery deadline in the
+# group.
 def prioritize_pkg_dict():
 
-    # Iterate through the set of all deadlines and assign priority
+    # Sort the deadline_set by deadline
     sorted_deadline_set = sorted(deadline_set)
-    priority = 1
 
+    # Iterate through the sorted deadline_set and assign priority in increment of 1.
+    priority = 1
     for deadline in sorted_deadline_set:
         deadline.priority = priority
         priority += 1
 
-    # Iterate through pkg_dict (address_id/[packages]).
+    # Iterate through pkg_dict{} dictionary.
     # For each list of packages, sort the list to find the earliest deadline.
-    # Assign priority
+    # Assign priority for the delivery address_id based on the earliest deadline.
     for key in pkg_dict.keys():
 
         package_list = pkg_dict.get(key)
@@ -484,12 +507,25 @@ def update_truck_routes(current_time):
                 truck.current_location = route.end_vertex
 
 
+# This function iterates through the PriorityQueue and loads packages onto truck based on user's
+# requirements and truck's availability.
 def create_delivery_route():
 
-    # Update truck's availability based on package-truck constraint
+    # Update truck's availability based on user's specified carrier truck requirement.
+    # Iterate through the entire pkg_dict{}.
     for address_key in pkg_dict.keys():
+
         required_truck = None
         pkg_list = pkg_dict.get(address_key)
+
+        # For each package in the list of all packages with the same delivery address, if package has a
+        # specific carrier truck requirement:
+        #       set required_truck to that truck, set carrier truck of all
+        #       packages in the list to the same truck
+        #       append those packages to truck -> reserved_pkg[] list
+        #       pre-increment the total_packages count.
+        # NOTE: reserved_pkg[] and pre-incrementing of total_packages are implemented to prevent truck
+        # overloading.
         for package in pkg_list:
             if package.truck is not None:
                 for truck in trucks:
@@ -502,17 +538,22 @@ def create_delivery_route():
                 truck.reserved_pkg.append(package.pkg_id)
                 truck.total_packages += 1
 
-    # Total packages per routes in dest_in_route[]
+    # Used as a flag that package loading is completed in order to break from the while loop.
     finished = False
 
+    # Iterate through the PriorityQueue until empty
     while not dest_priority_queue.empty():
         total_packages = 0
         required_truck_id = None
         required_truck = None
+        # List of all delivery addresses/destinations in this route
         dest_in_route = []
 
+        # Pop the next address from queue
         next_address = dest_priority_queue.get()
 
+        # If package has been delivered (address NOT in pkg_dic{}), keep popping.
+        # If the queue is empty, switch "finished" flag to True to exit the while loop.
         while next_address[1] not in pkg_dict.keys():
             if not dest_priority_queue.empty():
                 next_address = dest_priority_queue.get()
@@ -520,10 +561,15 @@ def create_delivery_route():
                 finished = True
                 break
 
+        # Once a valid delivery address has been selected and if queue is not empty
         if not finished:
 
+            # If delivery address is at HUB, sort the list of packages at HUB by deadline and set the
+            # latest_pickup_time to the deadline of the last package in the list.
+            # The lastest_pickup_time is used to determine if the packages are ready for pick-up or not.
             if next_address[1] == hub_address:
                 pickup_package_list = pkg_dict.get(next_address[1])
+                pickup_package_list = sorted(pickup_package_list, key=attrgetter('deadline'))
                 latest_pickup_time = pickup_package_list[len(pickup_package_list) - 1].deadline
 
                 # if departure time for either truck 1 or truck 2 is less than pick_up time
@@ -531,11 +577,13 @@ def create_delivery_route():
                 # else if both trucks are ready for pick-up
                 # select the truck with the less number of packages
                 # Get to_vertex from graph using address_id
-                next_address_id = None
-                for address, id_value in address_dict.items():
-                    if address == next_address[1]:
-                        next_address_id = id_value
-                        break
+
+                # Get
+                next_address_id = address_dict.get(next_address[1])
+                # for address, id_value in address_dict.items():
+                #     if address == next_address[1]:
+                #         next_address_id = id_value
+                #         break
                 to_vertex = graph.get_vertex(next_address_id)
                 available_trucks = []
                 ready_for_pickup = False
@@ -1075,15 +1123,18 @@ if __name__ == "__main__":
         trucks.append(truck)
         i += 1
 
-    # Load data for packages and save them into a priority queue.
+    # Load data for packages and save them into the global pkg_dict{} dictionary
     pkg_filename = "package_data.csv"
     load_pkg_data(pkg_filename)
 
+    # Create the chaining hash table using data from pkg_dict{} dictionary.
     create_hash_table()
-    # Priority is assigned based on deadline.
-    # Packages with combined packages constraint have the same Priority #
+
+    # Create a PriorityQueue to prioritize package delivery using data from pkg_dict{}.
     prioritize_pkg_dict()
 
+    # Pop delivery address_id from the created PriorityQueue one at a time.
+    # For each address_id, gather the list of packages and start loading them onto trucks.
     create_delivery_route()
 
     # Reset truck's data

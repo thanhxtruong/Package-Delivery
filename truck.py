@@ -18,7 +18,7 @@ class Truck:
         # onto trucks.
         # [Packages] is list of all packages that have the same delivery address.
         self.routes = {}
-        # Total packages loaded onto truck, which is during package loading as a flag that truck
+        # Total packages loaded onto truck, which is used during package loading as a flag that truck
         # is full.
         self.total_packages = 0
         # Address of truck's current location, which is used during package loading and delivery
@@ -34,6 +34,7 @@ class Truck:
         # List of all packages that must be delivered by this truck, which is established by the
         # combination of user-specified requirements for required truck and packages that must
         # be delivered together.
+        # This list together with the total_packages are used as a flag that all packages have been delivered by truck.
         self.reserved_pkg = []
         # Used as a flag when all packages have been delivered in order to start loading packages
         # onto back-up truck
