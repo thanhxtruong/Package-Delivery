@@ -26,7 +26,7 @@ deadline_set = set()
 # first put into a set
 # This list contains all of the created sets
 same_route_set_list = []
-# Priority queue organized by address_id and priority.
+# Priority queue organized by address and priority.
 # By the time all packages have been loaded onto trucks, PriorityQueue will be empty.
 dest_priority_queue = PriorityQueue()
 # List of all sub-graph with vertices to which packages are to be delivered together in the same route.
@@ -42,13 +42,13 @@ graph = Graph()
 pickup_packages = {}
 # Chaining Hash Table holding package data for easy status look-up
 pkg_hash_table = ChainingHashTable()
+# List of all trucks available at WGUPS
+trucks = []
 
 # Maximum number of packages a truck can carry
 MAX_PKG_PER_TRUCK = 16
 # Truck's speed
 SPEED = 18
-# List of all trucks available at WGUPS
-trucks = []
 
 
 # This function is used to load raw distance data from csv file into a Graph data structure.
@@ -467,12 +467,12 @@ def print_pkg_pickup(package_list, required_truck, arrival):
 def get_user_input():
     prompts = ["Enter a package ID: ", "Enter delivery address: ", "Enter delivery city: ", "Enter delivery zip code: ", "Enter delivery state: ", "Enter delivery deadline: ", "Enter package weight: "]
     # input_parameters = ['27', '1060 Dalton Ave S', 'Salt Lake City', '84104', 'UT', 'EOD', '5']
-    input_parameters = ['9', '300 State St', 'Salt Lake City', '84103', 'UT', 'EOD', '2']
-    # input_parameters = []
-    # print("Enter the following information for the package to check status:")
-    # for prompt_index in range(len(prompts)):
-    #     user_input = input(prompts[prompt_index])
-    #     input_parameters.append(user_input)
+    # input_parameters = ['9', '300 State St', 'Salt Lake City', '84103', 'UT', 'EOD', '2']
+    input_parameters = []
+    print("Enter the following information for the package to check status:")
+    for prompt_index in range(len(prompts)):
+        user_input = input(prompts[prompt_index])
+        input_parameters.append(user_input)
 
     input_address = Address(input_parameters[1], input_parameters[2], input_parameters[3], input_parameters[4])
     input_package = Package(int(input_parameters[0]), input_address, float(input_parameters[6]))
@@ -552,8 +552,8 @@ def create_delivery_route():
         if required_truck is not None:
             for package in pkg_list:
                 package.truck = required_truck.id
-                truck.reserved_pkg.append(package.pkg_id)
-                truck.total_packages += 1
+                required_truck.reserved_pkg.append(package.pkg_id)
+                required_truck.total_packages += 1
 
     # Used as a flag that package loading is completed in order to break from the while loop.
     finished = False
@@ -1144,6 +1144,8 @@ def update_delivery_route(truck):
 # The active route will be printed to the console.
 def simulate_delivery_routes(current_time):
 
+    delivered_all_packages = False
+
     # For each truck's delivery routes, print the route that falls between the input time.
     for truck in trucks:
         for route in list(truck.routes.keys()):
@@ -1175,6 +1177,15 @@ def simulate_delivery_routes(current_time):
                             print("\tPackage %s will be delivered to %s at %s." % (
                             concatenated_pkg, destination, str(deliver_time)))
                             print('')
+
+                delivered_all_packages = False
+                break
+
+            else:
+                delivered_all_packages = True
+
+        if delivered_all_packages:
+            print("All packages have been delivered by Truck %d." %(truck.id))
         print('====================================================================')
 
 
@@ -1214,6 +1225,7 @@ def remove_package(package_to_remove):
                 pkg_dict.pop(package_to_remove.address)
 
 
+# This function prints the main menu to the console
 def print_main_menu():
     print("Menu:")
     print("\t1. Start delivery")
@@ -1221,6 +1233,47 @@ def print_main_menu():
     print("\t3. Check package status")
     print("\t4. Update package")
     print("\t5. Exit")
+
+
+# This function print package's status to the console
+def print_package_status(package, current_time, file_output):
+    # Convert delivery deadline for console output
+    if package.deadline == time(23, 0, 0):
+        converted_deadline = 'EOD'
+    else:
+        converted_deadline = package.deadline
+
+    # Output package's status to console
+    print("======================================================================================")
+    print("Package Number: " + str(package.pkg_id), end='\t')
+    print("Weight: " + str(package.weight), end='\t')
+    print("Delivery Deadline: " + str(converted_deadline), end='\t')
+    if current_time >= package.delivered_time:
+        print("Current Status: %s at %s" % (package.status, package.delivered_time), end='\t')
+    else:
+        print("Current Status: " + package.status, end='\t')
+    print("Delivery Address: ", end='\t')
+    print(package.address)
+
+
+# This function output delivery for ALL packages to a CSV file
+def output_package_status(package, current_time):
+
+    # Convert delivery deadline for console output
+    if package.deadline == time(23, 0, 0):
+        converted_deadline = 'EOD'
+    else:
+        converted_deadline = package.deadline
+
+    pkg_status_file = open('package_status.csv', 'a')
+    pkg_status_file.seek(0, 2)
+    wr = csv.DictWriter(pkg_status_file, fieldnames=status_fields, lineterminator='\n')
+    if current_time >= package.delivered_time:
+        wr.writerow({'PackageID': package.pkg_id, 'Weight': package.weight, 'Delivery Deadline': converted_deadline, 'Current Status': package.status + " at " + str(package.delivered_time), 'Delivery Address': package.address})
+    else:
+        wr.writerow({'PackageID': package.pkg_id, 'Weight': package.weight, 'Delivery Deadline': converted_deadline, 'Current Status': package.status, 'Delivery Address': package.address})
+
+    pkg_status_file.close()
 
 
 if __name__ == "__main__":
@@ -1316,39 +1369,45 @@ if __name__ == "__main__":
         if user_selection == 3:
 
             # Output current time, which is default to 8 AM
-            current_time = time(8, 0, 0)
-            print('')
-            print("The current time is:\t" + current_time.strftime('%H: %M'))
-            print('')
+            # current_time = time(8, 0, 0)
+            # print('')
+            # print("The current time is:\t" + current_time.strftime('%H: %M'))
+            # print('')
+
+            # Prompt user to set a time
+            prompt = "Enter a new time (HH:MM): "
+            current_time = get_new_time(prompt)
 
             # Update packages' status and truck's current location and departure time
             update_pkg_status(current_time)
             update_truck_routes(current_time)
 
-            # Prompt user to input the package of interest
-            pkg_to_search = get_user_input()
+            # Prompt user to select printing status for all or a specific package
+            option = input("Would you like to display delivery status for all packages? (Y/N): ")
 
-            # Get the matched package from hash table
-            pkg_found = pkg_hash_table.search(pkg_to_search)
+            # Print status for all packages
+            if option.capitalize() == 'Y':
+                pkg_status_file = open('package_status.csv', 'w')
+                status_fields = ('PackageID', 'Weight', 'Delivery Deadline', 'Current Status', 'Delivery Address')
+                status_wr = csv.DictWriter(pkg_status_file, fieldnames=status_fields, lineterminator='\n')
+                status_wr.writeheader()
+                pkg_status_file.close()
 
-            # Convert delivery deadline for console output
-            if pkg_found.deadline == time(23, 0, 0):
-                converted_deadline = 'EOD'
-            else:
-                converted_deadline = pkg_found.deadline
+                print('')
+                print("Results are output to the package_status.csv file")
+                print('')
+                for bucket in pkg_hash_table.table:
+                    for package in bucket:
+                        output_package_status(package, current_time)
 
-            # Output package's status to console
-            print("====================================================================")
-            print("Package Number: " + str(pkg_found.pkg_id))
-            print("Delivery Address: ")
-            print(pkg_found.address)
-            print("Weight: " + str(pkg_found.weight))
-            print("Delivery Deadline: " + str(converted_deadline))
-            if current_time >= pkg_found.delivered_time:
-                print("Current Status: %s at %s" % (pkg_found.status, pkg_found.delivered_time))
-            else:
-                print("Current Status: " + pkg_found.status)
-            print("====================================================================")
+            # Prompt user for a specific package and print status for the matching package
+            elif option.capitalize() == 'N':
+
+                # Prompt user to input the package of interest
+                pkg_to_search = get_user_input()
+                # Get the matched package from hash table
+                pkg_found = pkg_hash_table.search(pkg_to_search)
+                print_package_status(pkg_found)
 
         # Update package requirement and recalculate delivery routes
         if user_selection == 4:
@@ -1435,15 +1494,15 @@ if __name__ == "__main__":
                             # Remove current package from pkg_dict{} and hash table.
                             # Update package's address.
                             if user_selection == 1:
-                                # new_street = input("Enter a street address: ")
-                                # new_city = input("Enter a new city: ")
-                                # new_zipCode = input("Enter a new zip code: ")
-                                # new_state = input("Enter a new state: ")
+                                new_street = input("Enter a street address: ")
+                                new_city = input("Enter a new city: ")
+                                new_zipCode = input("Enter a new zip code: ")
+                                new_state = input("Enter a new state: ")
 
-                                new_street = '410 S State St'
-                                new_city = 'Salt Lake City'
-                                new_zipCode = '84111'
-                                new_state = 'UT'
+                                # new_street = '410 S State St'
+                                # new_city = 'Salt Lake City'
+                                # new_zipCode = '84111'
+                                # new_state = 'UT'
 
                                 new_address = Address(new_street, new_city, new_zipCode, new_state)
                                 # Get address from address_dict{}

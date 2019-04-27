@@ -71,6 +71,7 @@ class Graph:
     def get_shortest_path(self, start_vertex, end_vertex):
         self.dijkstra_shortest_path(start_vertex)
         # Start from end_vertex and build the path backwards.
+        # [(Address, [Packages]), (Address, [Packages])]
         path = []
         current_vertex = end_vertex
         while current_vertex is not start_vertex:
