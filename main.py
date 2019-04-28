@@ -422,6 +422,9 @@ def print_pkg_loading(package_list, required_truck, address, arrival):
 
 def output_truck_routes():
     # Set up output file for trucks' routes
+    print('')
+    print("Delivery routes for each truck is output to routes.csv file")
+    print('=========================================================================================')
     truck_route = open('routes.csv', 'w')
 
     truck_fields = ('Truck', 'Departure', 'Departure Time', 'Arrival', 'Arrival Time', 'Route', 'Package(s) Delivered')
@@ -432,6 +435,9 @@ def output_truck_routes():
     wr = csv.DictWriter(truck_route, fieldnames=truck_fields, lineterminator='\n')
 
     for truck in trucks:
+        print("Total packages packages delivered by Truck %d is %d packages." %(truck.id, truck.total_packages))
+        print("Total mileage traveled by Truck %d is %.2f miles." %(truck.id, truck.total_miles))
+        print('')
         for route in truck.routes.keys():
             departure_address = list(address_dict.keys())[route.start_vertex.address_id - 1]
             destination_address = list(address_dict.keys())[route.end_vertex.address_id - 1]
@@ -469,7 +475,7 @@ def get_user_input():
     # input_parameters = ['27', '1060 Dalton Ave S', 'Salt Lake City', '84104', 'UT', 'EOD', '5']
     # input_parameters = ['9', '300 State St', 'Salt Lake City', '84103', 'UT', 'EOD', '2']
     input_parameters = []
-    print("Enter the following information for the package to check status:")
+    print("Enter the following information for the package:")
     for prompt_index in range(len(prompts)):
         user_input = input(prompts[prompt_index])
         input_parameters.append(user_input)
@@ -515,13 +521,16 @@ def update_pkg_status(current_time):
 # This function update truck's current location and departure time based on the input current time.
 def update_truck_routes(current_time):
     for truck in trucks:
+        truck.total_miles = 0
         for route in truck.routes.keys():
-
             # Re-set truck's departure and current location to the route that falls between
             # the current time.
             if route.departure <= current_time <= route.arrival:
                 truck.departure = route.arrival
                 truck.current_location = route.end_vertex
+                truck.total_miles += route.miles
+            elif route.arrival < current_time:
+                truck.total_miles += route.miles
 
 
 # This function iterates through the PriorityQueue and loads packages onto truck based on user's
@@ -808,7 +817,8 @@ def create_delivery_route():
 
                     # Create new route and add to required_truck -> routes{}
                     # Update total_packages for required_truck
-                    route = Route(required_truck.current_location, to_vertex, required_truck.departure, arrival)
+                    route = Route(required_truck.current_location, to_vertex, required_truck.departure, arrival, distance)
+                    required_truck.total_miles += distance
                     required_truck.add_route(route, path)
                     required_truck.total_packages += packages_per_route
 
@@ -874,8 +884,9 @@ def create_delivery_route():
 
                         # Create new route and add to required_truck -> routes{}
                         # Update total_packages for required_truck
-                        route = Route(from_vertex, hub_vertex, required_truck.departure, arrival)
+                        route = Route(from_vertex, hub_vertex, required_truck.departure, arrival, distance)
                         required_truck.add_route(route, path)
+                        required_truck.total_miles += distance
                         print('*************************************************************')
                         print("Sending Truck %d back to HUB. Truck will arrive at HUB at %s" % (required_truck.id, arrival))
 
@@ -1066,8 +1077,9 @@ def update_delivery_route(truck):
                     arrival = dt.time()
                     # Create new route and add to truck -> routes{}
                     # Update total_packages for truck
-                    route = Route(truck.current_location, to_vertex, truck.departure, arrival)
+                    route = Route(truck.current_location, to_vertex, truck.departure, arrival, distance)
                     truck.add_route(route, path)
+                    truck.total_miles += distance
                     # truck.total_packages += packages_per_route
 
                     # Clear shortest path calculation
@@ -1148,45 +1160,47 @@ def simulate_delivery_routes(current_time):
 
     # For each truck's delivery routes, print the route that falls between the input time.
     for truck in trucks:
-        for route in list(truck.routes.keys()):
+        route_list = list(truck.routes.keys())
+        first_route = route_list[0]
+        if first_route.departure <= current_time:
+            for route in list(truck.routes.keys()):
+                # Select the active route.
+                if route.departure <= current_time <= route.arrival:
 
-            # Select the active route.
-            if route.departure <= current_time <= route.arrival:
+                    # List of all destination in the active route
+                    path = truck.routes.get(route)
 
-                # List of all destination in the active route
-                path = truck.routes.get(route)
+                    for path_index in range(len(path)):
 
-                for path_index in range(len(path)):
-
-                    # Output print for vertex departure
-                    if path_index == 0:
-                        departure_address = list(address_dict.keys())[path[path_index][0] - 1]
-                        print("Truck %d departed %s at %s." % (truck.id, departure_address, route.departure))
-                        print('')
-
-                    # Output print for package delivery at each destination
-                    else:
-                        package_list = path[path_index][1]
-                        if len(package_list) > 0:
-                            concatenated_pkg = ''
-                            destination = list(address_dict.keys())[path[path_index][0] - 1]
-                            for package in package_list:
-                                concatenated_pkg += str(package.pkg_id) + ', '
-                                deliver_time = package.delivered_time
-                            concatenated_pkg = concatenated_pkg[:-1:]
-                            print("\tPackage %s will be delivered to %s at %s." % (
-                            concatenated_pkg, destination, str(deliver_time)))
+                        # Output print for vertex departure
+                        if path_index == 0:
+                            departure_address = list(address_dict.keys())[path[path_index][0] - 1]
+                            print("Truck %d departed %s at %s." % (truck.id, departure_address, route.departure))
                             print('')
 
-                delivered_all_packages = False
-                break
+                        # Output print for package delivery at each destination
+                        else:
+                            package_list = path[path_index][1]
+                            if len(package_list) > 0:
+                                concatenated_pkg = ''
+                                destination = list(address_dict.keys())[path[path_index][0] - 1]
+                                for package in package_list:
+                                    concatenated_pkg += str(package.pkg_id) + ', '
+                                    deliver_time = package.delivered_time
+                                concatenated_pkg = concatenated_pkg[:-1:]
+                                print("\tPackage %s will be delivered to %s at %s." % (
+                                concatenated_pkg, destination, str(deliver_time)))
+                                print('')
 
-            else:
-                delivered_all_packages = True
+                    delivered_all_packages = False
+                    break
 
-        if delivered_all_packages:
-            print("All packages have been delivered by Truck %d." %(truck.id))
-        print('====================================================================')
+                else:
+                    delivered_all_packages = True
+
+            if delivered_all_packages:
+                print("All packages have been delivered by Truck %d." %(truck.id))
+            print('====================================================================')
 
 
 # This functions prompts user to input a new time and validate user input before returning the valid time.
@@ -1236,7 +1250,7 @@ def print_main_menu():
 
 
 # This function print package's status to the console
-def print_package_status(package, current_time, file_output):
+def print_package_status(package, current_time):
     # Convert delivery deadline for console output
     if package.deadline == time(23, 0, 0):
         converted_deadline = 'EOD'
@@ -1309,6 +1323,8 @@ if __name__ == "__main__":
     # Load data for packages and save them into the global pkg_dict{} dictionary
     pkg_filename = "package_data.csv"
     load_pkg_data(pkg_filename)
+    print('')
+    print("Loaded packages on each truck is output to package_loadng.csv file")
 
     # Create the chaining hash table using data from pkg_dict{} dictionary.
     create_hash_table()
@@ -1327,11 +1343,10 @@ if __name__ == "__main__":
         truck.departure = time(8, 0, 0)
 
     # Delivery simulation and UI
-    print_main_menu()
-
     user_selection = 1
 
     while not user_selection == 5:
+        print_main_menu()
         user_selection = input("Select a number from 1-5 from the menu above: ")
 
         # User-input validation
@@ -1407,7 +1422,7 @@ if __name__ == "__main__":
                 pkg_to_search = get_user_input()
                 # Get the matched package from hash table
                 pkg_found = pkg_hash_table.search(pkg_to_search)
-                print_package_status(pkg_found)
+                print_package_status(pkg_found, current_time)
 
         # Update package requirement and recalculate delivery routes
         if user_selection == 4:
@@ -1444,6 +1459,7 @@ if __name__ == "__main__":
                     if len(dest_pkg_tuple[1]) > 0:
                         for package in dest_pkg_tuple[1]:
                             if not package.status == 'Delivered':
+                                # Lock in delivery truck
                                 package.truck = affected_truck.id
                                 if package.address not in pkg_dict.keys():
                                     pkg_dict[package.address] = [package]

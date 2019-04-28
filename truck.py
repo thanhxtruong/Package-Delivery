@@ -4,11 +4,12 @@ import sys
 # This Route class is used to hold each route traveled by trucks.
 # It is used as keys in the Truck -> routes{} dictionary of the Truck class.
 class Route:
-    def __init__(self, start_vertex, end_vertex, departure, arrival):
+    def __init__(self, start_vertex, end_vertex, departure, arrival, miles):
         self.start_vertex = start_vertex
         self.end_vertex = end_vertex
         self.departure = departure
         self.arrival = arrival
+        self.miles = miles
 
 
 class Truck:
@@ -21,6 +22,8 @@ class Truck:
         # Total packages loaded onto truck, which is used during package loading as a flag that truck
         # is full.
         self.total_packages = 0
+        # Total miles traveled by truck
+        self.total_miles = 0
         # Address of truck's current location, which is used during package loading and delivery
         # simulation.
         self.current_location = None
