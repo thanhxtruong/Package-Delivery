@@ -38,7 +38,7 @@ class Truck:
         # combination of user-specified requirements for required truck and packages that must
         # be delivered together.
         # This list together with the total_packages are used as a flag that all packages have been delivered by truck.
-        self.reserved_pkg = []
+        self.reserved_pkg = {}
         # Used as a flag when all packages have been delivered in order to start loading packages
         # onto back-up truck
         self.completed_all_routes = False
