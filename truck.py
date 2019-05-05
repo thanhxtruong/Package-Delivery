@@ -32,16 +32,12 @@ class Truck:
         # Pickup_time is the fixed time of when truck start its day (8 AM for trucks with drivers
         # and whatever time the driver of the back-up truck finished delivery of the first truck.
         self.pickup_time = None
-        # Used to keep track of trucks with driver and back-up trucks
-        self.driver = None
         # List of all packages that must be delivered by this truck, which is established by the
         # combination of user-specified requirements for required truck and packages that must
         # be delivered together.
         # This list together with the total_packages are used as a flag that all packages have been delivered by truck.
+        # { Address object: [Packages] }
         self.reserved_pkg = {}
-        # Used as a flag when all packages have been delivered in order to start loading packages
-        # onto back-up truck
-        self.completed_all_routes = False
 
     def __str__(self):
         return self.id

@@ -52,17 +52,12 @@ class Package:
 
         # Delivery deadline (Time object NOT Deadline object)
         self.deadline = None
-        # Pre-set pickup time per user's requirement (Time object NOT Deadline object)
-        self.later_pickup_time = None
         # Calculated Time at which the package will be picked up by the carrier truck
         self.pickup_time = None
         # Calculated Time at which the package will be delivered.
         self.delivered_time = None
         # Carrier truck delivering the package.
         self.truck = None
-        # List of all packages that must be delivered with this package per user's
-        # requirement.
-        self.combined_pkg = []
         # The current status of the package.
         self.status = self.add_status(0)
 

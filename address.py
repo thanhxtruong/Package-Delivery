@@ -1,6 +1,8 @@
 # This class holds all data related to an address as downloaded from the csv file.
 # The built-in functions are overridden to compare and hash using all attributes of
 # the Address class.
+
+
 class Address:
     def __init__(self, address, city, zip_code, state):
         self.address1 = address
